@@ -148,13 +148,15 @@ Kirigami.ApplicationWindow {
         modal: true
         standardButtons: QQC2.Dialog.Yes | QQC2.Dialog.No
         anchors.centerIn: parent
-        rightPadding: Kirigami.Units.smallSpacing * 2
-        bottomPadding: Kirigami.Units.smallSpacing * 2
+        padding: Kirigami.Units.smallSpacing * 2
+        leftPadding: padding
+        rightPadding: padding
+        topPadding: padding
+        bottomPadding: padding
 
         contentItem: ColumnLayout {
             spacing: Kirigami.Units.smallSpacing
-            Layout.preferredWidth: Kirigami.Units.gridUnit * 18
-            Layout.preferredHeight: implicitHeight
+            implicitWidth: Kirigami.Units.gridUnit * 18
 
             QQC2.Label {
                 Layout.fillWidth: true
