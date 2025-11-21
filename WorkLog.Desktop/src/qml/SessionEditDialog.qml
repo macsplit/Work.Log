@@ -137,39 +137,45 @@ QQC2.Dialog {
         }
 
         // Description
-        QQC2.TextArea {
-            id: descriptionField
+        QQC2.ScrollView {
             Kirigami.FormData.label: i18n("Description:")
             Layout.fillWidth: true
-            Layout.minimumHeight: Kirigami.Units.gridUnit * 4
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 5
-            text: root.description
-            placeholderText: i18n("Describe the work you did...")
-            wrapMode: TextEdit.Wrap
+            implicitHeight: Kirigami.Units.gridUnit * 5
+
+            QQC2.TextArea {
+                id: descriptionField
+                text: root.description
+                placeholderText: i18n("Describe the work you did...")
+                wrapMode: TextEdit.Wrap
+            }
         }
 
         // Notes
-        QQC2.TextArea {
-            id: notesField
+        QQC2.ScrollView {
             Kirigami.FormData.label: i18n("Notes (optional):")
             Layout.fillWidth: true
-            Layout.minimumHeight: Kirigami.Units.gridUnit * 3
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 4
-            text: root.notes
-            placeholderText: i18n("Additional notes...")
-            wrapMode: TextEdit.Wrap
+            implicitHeight: Kirigami.Units.gridUnit * 4
+
+            QQC2.TextArea {
+                id: notesField
+                text: root.notes
+                placeholderText: i18n("Additional notes...")
+                wrapMode: TextEdit.Wrap
+            }
         }
 
         // Next planned stage
-        QQC2.TextArea {
-            id: nextStageField
+        QQC2.ScrollView {
             Kirigami.FormData.label: i18n("Next Planned Stage (optional):")
             Layout.fillWidth: true
-            Layout.minimumHeight: Kirigami.Units.gridUnit * 3
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
-            text: root.nextPlannedStage
-            placeholderText: i18n("What's planned next...")
-            wrapMode: TextEdit.Wrap
+            implicitHeight: Kirigami.Units.gridUnit * 3
+
+            QQC2.TextArea {
+                id: nextStageField
+                text: root.nextPlannedStage
+                placeholderText: i18n("What's planned next...")
+                wrapMode: TextEdit.Wrap
+            }
         }
     }
 
