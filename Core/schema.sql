@@ -17,6 +17,15 @@ CREATE TABLE IF NOT EXISTS SystemSettings (
     Value TEXT NOT NULL
 );
 
+-- Tags - for categorizing work sessions
+CREATE TABLE IF NOT EXISTS Tags (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name TEXT NOT NULL,
+    UserId INTEGER,                      -- NULL for desktop app, user ID for web app
+    UNIQUE(Name, UserId),                -- Tag names unique per user
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+);
+
 -- Work Sessions - the main data table
 CREATE TABLE IF NOT EXISTS WorkSessions (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,10 +34,12 @@ CREATE TABLE IF NOT EXISTS WorkSessions (
     Description TEXT NOT NULL,           -- Description of work done
     Notes TEXT,                          -- Optional notes
     NextPlannedStage TEXT,               -- Optional next planned stage
+    TagId INTEGER,                       -- Optional tag (NULL = no tag)
     CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
     UpdatedAt TEXT NOT NULL DEFAULT (datetime('now')),
     UserId INTEGER,                      -- NULL for desktop app, user ID for web app
-    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
+    FOREIGN KEY (TagId) REFERENCES Tags(Id) ON DELETE SET NULL
 );
 
 -- Index for efficient date-based queries (hierarchy navigation)
