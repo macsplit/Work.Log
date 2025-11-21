@@ -61,8 +61,8 @@ Kirigami.ScrollablePage {
                         implicitWidth: tagLabel.implicitWidth + Kirigami.Units.smallSpacing * 2
                         implicitHeight: tagLabel.implicitHeight + Kirigami.Units.smallSpacing
                         radius: height / 2
-                        color: sessionDelegate.highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.highlightColor
-                        opacity: 0.2
+                        color: Kirigami.Theme.highlightColor
+                        opacity: sessionDelegate.highlighted ? 0.5 : 0.28
 
                         QQC2.Label {
                             id: tagLabel
