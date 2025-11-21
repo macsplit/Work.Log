@@ -172,7 +172,7 @@ QQC2.Dialog {
                 text: root.nextPlannedStage
                 placeholderText: i18n("What's planned next...")
                 wrapMode: TextEdit.Wrap
-                Keys.onTabPressed: notesField.forceActiveFocus()
+                Keys.onTabPressed: dateField.forceActiveFocus()
                 Keys.onBacktabPressed: notesField.forceActiveFocus()
             }
         }
