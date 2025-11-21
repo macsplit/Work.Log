@@ -42,4 +42,11 @@ public class WorkSession
     public int UserId { get; set; }
 
     public User? User { get; set; }
+
+    /// <summary>
+    /// Optional tag for categorizing the session.
+    /// </summary>
+    public int? TagId { get; set; }
+
+    public Tag? Tag { get; set; }
 }

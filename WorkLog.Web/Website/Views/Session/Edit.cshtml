@@ -32,6 +32,16 @@
             </div>
 
             <div class="form-group">
+                <label asp-for="TagId">Tag (optional)</label>
+                <div class="tag-input-row">
+                    <select asp-for="TagId" asp-items="Model.AvailableTags" class="form-control">
+                        <option value="">No tag</option>
+                    </select>
+                    <a asp-controller="Tag" asp-action="Index" class="btn btn-sm btn-secondary">Manage Tags</a>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label asp-for="Description">Description *</label>
                 <textarea asp-for="Description" class="form-control" rows="4"
                           placeholder="Describe the work you did..."></textarea>

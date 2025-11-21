@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace WorkLog.Website.Models;
 
@@ -23,6 +24,21 @@ public class SessionEditViewModel
 
     [StringLength(500, ErrorMessage = "Next planned stage must be less than 500 characters")]
     public string? NextPlannedStage { get; set; }
+
+    /// <summary>
+    /// Optional tag for categorizing the session.
+    /// </summary>
+    public int? TagId { get; set; }
+
+    /// <summary>
+    /// The name of the selected tag (for display purposes).
+    /// </summary>
+    public string? TagName { get; set; }
+
+    /// <summary>
+    /// Available tags for selection.
+    /// </summary>
+    public SelectList? AvailableTags { get; set; }
 
     /// <summary>
     /// Returns time options for the dropdown (0.5 to 12 in 0.5 increments).

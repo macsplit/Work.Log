@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
 using WorkLog.Domain.Services;
 using WorkLog.Website.Models;
@@ -10,10 +11,12 @@ namespace WorkLog.Website.Controllers;
 public class SessionController : Controller
 {
     private readonly IWorkSessionService _sessionService;
+    private readonly ITagService _tagService;
 
-    public SessionController(IWorkSessionService sessionService)
+    public SessionController(IWorkSessionService sessionService, ITagService tagService)
     {
         _sessionService = sessionService;
+        _tagService = tagService;
     }
 
     private int GetCurrentUserId()
@@ -22,15 +25,23 @@ public class SessionController : Controller
         return claim != null ? int.Parse(claim.Value) : 0;
     }
 
-    [HttpGet]
-    public IActionResult Create(string? date)
+    private async Task<SelectList> GetTagSelectList(int userId, int? selectedTagId = null)
     {
+        var tags = await _tagService.GetAllTags(userId);
+        return new SelectList(tags, "Id", "Name", selectedTagId);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Create(string? date)
+    {
+        var userId = GetCurrentUserId();
         var model = new SessionEditViewModel
         {
             SessionDate = string.IsNullOrEmpty(date)
                 ? DateOnly.FromDateTime(DateTime.Today)
                 : DateOnly.Parse(date),
-            TimeHours = 1.0
+            TimeHours = 1.0,
+            AvailableTags = await GetTagSelectList(userId)
         };
 
         return View(model);
@@ -40,12 +51,13 @@ public class SessionController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(SessionEditViewModel model)
     {
+        var userId = GetCurrentUserId();
+
         if (!ModelState.IsValid)
         {
+            model.AvailableTags = await GetTagSelectList(userId, model.TagId);
             return View(model);
         }
-
-        var userId = GetCurrentUserId();
 
         await _sessionService.CreateSession(
             userId,
@@ -53,7 +65,8 @@ public class SessionController : Controller
             model.TimeHours,
             model.Description,
             model.Notes,
-            model.NextPlannedStage);
+            model.NextPlannedStage,
+            model.TagId);
 
         return RedirectToAction("Index", "Home", new
         {
@@ -81,7 +94,10 @@ public class SessionController : Controller
             TimeHours = session.TimeHours,
             Description = session.Description,
             Notes = session.Notes,
-            NextPlannedStage = session.NextPlannedStage
+            NextPlannedStage = session.NextPlannedStage,
+            TagId = session.TagId,
+            TagName = session.Tag?.Name,
+            AvailableTags = await GetTagSelectList(userId, session.TagId)
         };
 
         return View(model);
@@ -96,12 +112,13 @@ public class SessionController : Controller
             return BadRequest();
         }
 
+        var userId = GetCurrentUserId();
+
         if (!ModelState.IsValid)
         {
+            model.AvailableTags = await GetTagSelectList(userId, model.TagId);
             return View(model);
         }
-
-        var userId = GetCurrentUserId();
 
         var result = await _sessionService.UpdateSession(
             id,
@@ -110,7 +127,8 @@ public class SessionController : Controller
             model.TimeHours,
             model.Description,
             model.Notes,
-            model.NextPlannedStage);
+            model.NextPlannedStage,
+            model.TagId);
 
         if (result == null)
         {
@@ -180,7 +198,9 @@ public class SessionController : Controller
             s.TimeHours,
             s.Description,
             s.Notes,
-            s.NextPlannedStage
+            s.NextPlannedStage,
+            s.TagId,
+            TagName = s.Tag?.Name
         }));
     }
 }

@@ -15,6 +15,7 @@ public class WorkLogDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<WorkSession> WorkSessions => Set<WorkSession>();
+    public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,6 +41,24 @@ public class WorkLogDbContext : DbContext
 
             entity.HasOne(e => e.User)
                   .WithMany(u => u.WorkSessions)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Tag)
+                  .WithMany(t => t.WorkSessions)
+                  .HasForeignKey(e => e.TagId)
+                  .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        // Tag configuration
+        modelBuilder.Entity<Tag>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => new { e.Name, e.UserId }).IsUnique();
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.Tags)
                   .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });

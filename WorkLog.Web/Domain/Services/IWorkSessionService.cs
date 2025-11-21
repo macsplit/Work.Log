@@ -9,12 +9,12 @@ public interface IWorkSessionService
 {
     // CRUD Operations
     Task<WorkSession> CreateSession(int userId, DateOnly date, double timeHours,
-        string description, string? notes = null, string? nextPlannedStage = null);
+        string description, string? notes = null, string? nextPlannedStage = null, int? tagId = null);
 
     Task<WorkSession?> GetSession(int id, int userId);
 
     Task<WorkSession?> UpdateSession(int id, int userId, DateOnly date, double timeHours,
-        string description, string? notes = null, string? nextPlannedStage = null);
+        string description, string? notes = null, string? nextPlannedStage = null, int? tagId = null);
 
     Task<bool> DeleteSession(int id, int userId);
 

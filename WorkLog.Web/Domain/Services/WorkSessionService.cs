@@ -18,7 +18,7 @@ public class WorkSessionService : IWorkSessionService
     }
 
     public async Task<WorkSession> CreateSession(int userId, DateOnly date, double timeHours,
-        string description, string? notes = null, string? nextPlannedStage = null)
+        string description, string? notes = null, string? nextPlannedStage = null, int? tagId = null)
     {
         // Round to nearest 0.5 hours
         timeHours = Math.Round(timeHours * 2) / 2;
@@ -31,6 +31,7 @@ public class WorkSessionService : IWorkSessionService
             Description = description,
             Notes = notes,
             NextPlannedStage = nextPlannedStage,
+            TagId = tagId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -44,11 +45,12 @@ public class WorkSessionService : IWorkSessionService
     public async Task<WorkSession?> GetSession(int id, int userId)
     {
         return await _context.WorkSessions
+            .Include(s => s.Tag)
             .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
     }
 
     public async Task<WorkSession?> UpdateSession(int id, int userId, DateOnly date,
-        double timeHours, string description, string? notes = null, string? nextPlannedStage = null)
+        double timeHours, string description, string? notes = null, string? nextPlannedStage = null, int? tagId = null)
     {
         var session = await _context.WorkSessions
             .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
@@ -66,6 +68,7 @@ public class WorkSessionService : IWorkSessionService
         session.Description = description;
         session.Notes = notes;
         session.NextPlannedStage = nextPlannedStage;
+        session.TagId = tagId;
         session.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
@@ -92,6 +95,7 @@ public class WorkSessionService : IWorkSessionService
     public async Task<IEnumerable<WorkSession>> GetSessionsForDate(int userId, DateOnly date)
     {
         return await _context.WorkSessions
+            .Include(s => s.Tag)
             .Where(s => s.UserId == userId && s.SessionDate == date)
             .OrderBy(s => s.CreatedAt)
             .ToListAsync();

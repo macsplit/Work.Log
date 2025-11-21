@@ -113,6 +113,10 @@
                             <div class="session-card" data-session-id="@session.Id">
                                 <div class="session-header">
                                     <span class="session-time">@session.TimeHours hour(s)</span>
+                                    @if (session.Tag != null)
+                                    {
+                                        <span class="tag-badge">@session.Tag.Name</span>
+                                    }
                                     <div class="session-actions">
                                         <a asp-controller="Session" asp-action="Edit" asp-route-id="@session.Id"
                                            class="btn btn-sm">Edit</a>

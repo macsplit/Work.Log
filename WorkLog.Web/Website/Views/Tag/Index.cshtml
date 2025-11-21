@@ -1,0 +1,90 @@
+@model IEnumerable<WorkLog.Domain.Entities.Tag>
+@{
+    ViewData["Title"] = "Manage Tags";
+}
+
+<div class="form-container">
+    <div class="form-card">
+        <h1>Manage Tags</h1>
+        <p class="form-hint">Tags help you categorize your work sessions.</p>
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="validation-summary">@TempData["Error"]</div>
+        }
+
+        <form asp-action="Create" method="post" class="tag-create-form">
+            @Html.AntiForgeryToken()
+            <div class="tag-input-row">
+                <input type="text" name="name" class="form-control" placeholder="Enter new tag name..." />
+                <button type="submit" class="btn btn-primary">Add Tag</button>
+            </div>
+        </form>
+
+        <div class="tag-list">
+            @if (!Model.Any())
+            {
+                <p class="empty-message">No tags yet. Create one above to get started.</p>
+            }
+            else
+            {
+                @foreach (var tag in Model)
+                {
+                    <div class="tag-item">
+                        <span class="tag-badge">@tag.Name</span>
+                        <form asp-action="Delete" asp-route-id="@tag.Id" method="post" style="display: inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Delete tag &quot;@tag.Name&quot;? Sessions using this tag will have their tag removed.');">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                }
+            }
+        </div>
+
+        <div class="form-actions">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-secondary">Back to Sessions</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tag-create-form {
+        margin-bottom: 1.5rem;
+    }
+    .tag-input-row {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    .tag-input-row .form-control {
+        flex: 1;
+    }
+    .tag-list {
+        margin: 1.5rem 0;
+    }
+    .tag-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--border-color, #e0e0e0);
+    }
+    .tag-item:last-child {
+        border-bottom: none;
+    }
+    .tag-badge {
+        background: var(--primary-color, #2196f3);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.9rem;
+    }
+    .empty-message {
+        text-align: center;
+        color: var(--text-secondary, #666);
+        padding: 2rem;
+    }
+</style>

@@ -458,6 +458,34 @@ textarea.form-control {
     margin-bottom: 1.5rem;
 }
 
+/* Tag badge */
+.tag-badge {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.session-header .tag-badge {
+    margin-right: auto;
+    margin-left: 0.75rem;
+}
+
+/* Tag input row */
+.tag-input-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tag-input-row .form-control {
+    flex: 1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .dashboard-layout {
@@ -472,5 +500,13 @@ textarea.form-control {
     .hierarchy-section.indented-2,
     .hierarchy-section.indented-3 {
         padding-left: 0.5rem;
+    }
+
+    .tag-input-row {
+        flex-direction: column;
+    }
+
+    .tag-input-row .btn {
+        width: 100%;
     }
 }
