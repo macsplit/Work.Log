@@ -1,0 +1,20 @@
+# Work Log Web - Docker Compose for Development
+
+services:
+  worklog-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: worklog-web-dev
+    ports:
+      - "5080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Data Source=/data/worklog.db
+    volumes:
+      # Persist database
+      - worklog-data-dev:/data
+    restart: unless-stopped
+
+volumes:
+  worklog-data-dev:

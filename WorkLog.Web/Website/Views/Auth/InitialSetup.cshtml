@@ -1,0 +1,41 @@
+@model InitialSetupViewModel
+@{
+    ViewData["Title"] = "Initial Setup";
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>Welcome to Work Log</h1>
+        <p class="auth-subtitle">Create your administrator account to get started</p>
+
+        <div class="info-box">
+            <p>This is the initial setup. The account you create here will be the administrator.</p>
+        </div>
+
+        <form asp-action="InitialSetup" method="post">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <div class="form-group">
+                <label asp-for="Username">Username</label>
+                <input asp-for="Username" class="form-control" autofocus placeholder="Choose a username" />
+                <span asp-validation-for="Username" class="validation-message"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" class="form-control" placeholder="At least 8 characters" />
+                <span asp-validation-for="Password" class="validation-message"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Confirm Password</label>
+                <input asp-for="ConfirmPassword" class="form-control" placeholder="Repeat your password" />
+                <span asp-validation-for="ConfirmPassword" class="validation-message"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </form>
+    </div>
+</div>

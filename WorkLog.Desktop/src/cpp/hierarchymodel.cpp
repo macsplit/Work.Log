@@ -1,0 +1,112 @@
+#include "hierarchymodel.h"
+#include "databasemanager.h"
+#include <QLocale>
+#include <QDate>
+
+HierarchyModel::HierarchyModel(DatabaseManager *db, QObject *parent)
+    : QObject(parent)
+    , m_database(db)
+{
+    connect(m_database, &DatabaseManager::dataChanged, this, &HierarchyModel::onDataChanged);
+    refresh();
+}
+
+void HierarchyModel::refresh()
+{
+    m_years = m_database->getYears();
+    emit yearsChanged();
+    emit hierarchyChanged();
+}
+
+void HierarchyModel::onDataChanged()
+{
+    refresh();
+}
+
+QVariantList HierarchyModel::years() const
+{
+    return m_years;
+}
+
+int HierarchyModel::selectedYear() const
+{
+    return m_selectedYear;
+}
+
+void HierarchyModel::setSelectedYear(int year)
+{
+    if (m_selectedYear != year) {
+        m_selectedYear = year;
+        m_selectedMonth = 0;
+        m_selectedWeek = 0;
+        emit selectedYearChanged();
+        emit selectedMonthChanged();
+        emit selectedWeekChanged();
+        emit hierarchyChanged();
+    }
+}
+
+int HierarchyModel::selectedMonth() const
+{
+    return m_selectedMonth;
+}
+
+void HierarchyModel::setSelectedMonth(int month)
+{
+    if (m_selectedMonth != month) {
+        m_selectedMonth = month;
+        m_selectedWeek = 0;
+        emit selectedMonthChanged();
+        emit selectedWeekChanged();
+        emit hierarchyChanged();
+    }
+}
+
+int HierarchyModel::selectedWeek() const
+{
+    return m_selectedWeek;
+}
+
+void HierarchyModel::setSelectedWeek(int week)
+{
+    if (m_selectedWeek != week) {
+        m_selectedWeek = week;
+        emit selectedWeekChanged();
+        emit hierarchyChanged();
+    }
+}
+
+QVariantList HierarchyModel::getMonths() const
+{
+    if (m_selectedYear == 0)
+        return QVariantList();
+    return m_database->getMonthsForYear(m_selectedYear);
+}
+
+QVariantList HierarchyModel::getWeeks() const
+{
+    if (m_selectedYear == 0 || m_selectedMonth == 0)
+        return QVariantList();
+    return m_database->getWeeksForMonth(m_selectedYear, m_selectedMonth);
+}
+
+QVariantList HierarchyModel::getDays() const
+{
+    if (m_selectedYear == 0 || m_selectedMonth == 0)
+        return QVariantList();
+
+    if (m_selectedWeek > 0) {
+        return m_database->getDaysForWeek(m_selectedYear, m_selectedWeek);
+    }
+    return m_database->getDaysForMonth(m_selectedYear, m_selectedMonth);
+}
+
+QString HierarchyModel::monthName(int month) const
+{
+    return QLocale().monthName(month);
+}
+
+QString HierarchyModel::weekLabel(int week) const
+{
+    return tr("Week %1").arg(week);
+}

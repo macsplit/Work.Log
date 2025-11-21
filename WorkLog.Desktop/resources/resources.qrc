@@ -1,0 +1,10 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/">
+        <file alias="qml/main.qml">../src/qml/main.qml</file>
+        <file alias="qml/HierarchyPane.qml">../src/qml/HierarchyPane.qml</file>
+        <file alias="qml/SessionListPane.qml">../src/qml/SessionListPane.qml</file>
+        <file alias="qml/SessionDetailPane.qml">../src/qml/SessionDetailPane.qml</file>
+        <file alias="qml/SessionEditDialog.qml">../src/qml/SessionEditDialog.qml</file>
+    </qresource>
+</RCC>

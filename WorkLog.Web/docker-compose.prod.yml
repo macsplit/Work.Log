@@ -1,0 +1,31 @@
+# Work Log Web - Docker Compose for Production
+
+services:
+  worklog-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: worklog-web
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Data Source=/data/worklog.db
+    volumes:
+      # Persist database - use a named volume or bind mount to a safe location
+      - worklog-data:/data
+    restart: always
+    # Resource limits for production
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+
+volumes:
+  worklog-data:
+    # For production, you may want to configure a specific driver or external volume
+    driver: local

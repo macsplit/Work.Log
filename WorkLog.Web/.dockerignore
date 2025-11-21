@@ -1,0 +1,22 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.vs
+.vscode
+*.user
+*.suo
+
+# Build outputs
+**/bin
+**/obj
+**/out
+
+# Test results
+**/TestResults
+
+# Other
+*.md
+LICENSE
+**/*.log

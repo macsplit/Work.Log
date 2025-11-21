@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Work Log</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="site-header">
+        <nav class="navbar">
+            <a class="navbar-brand" href="/">Work Log</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="nav-user">
+                    <span>@User.Identity.Name</span>
+                    <form asp-controller="Auth" asp-action="Logout" method="post" class="logout-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-link">Logout</button>
+                    </form>
+                </div>
+            }
+        </nav>
+    </header>
+
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <p>&copy; @DateTime.Now.Year Work Log</p>
+    </footer>
+
+    <script src="~/js/site.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

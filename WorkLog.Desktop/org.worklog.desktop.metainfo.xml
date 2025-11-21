@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>org.worklog.desktop</id>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>GPL-3.0-or-later</project_license>
+    <name>Work Log</name>
+    <summary>Track your work sessions</summary>
+    <description>
+        <p>Work Log is a simple application to track your work sessions organized by date.</p>
+        <p>Features:</p>
+        <ul>
+            <li>Hierarchical navigation by year, month, week, and day</li>
+            <li>Record work sessions with time, description, notes, and next planned stage</li>
+            <li>SQLite database for reliable local storage</li>
+        </ul>
+    </description>
+    <launchable type="desktop-id">org.worklog.desktop.desktop</launchable>
+    <url type="homepage">https://github.com/worklog/worklog</url>
+    <provides>
+        <binary>worklog-desktop</binary>
+    </provides>
+    <content_rating type="oars-1.1"/>
+</component>

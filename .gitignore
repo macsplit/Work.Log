@@ -1,0 +1,134 @@
+# Dependencies (external - not part of this repo)
+Dependencies/
+
+# =============================================================================
+# Desktop App (Qt/KDE)
+# =============================================================================
+
+# Build directories
+WorkLog.Desktop/build/
+WorkLog.Desktop/cmake-build-*/
+
+# Qt Creator
+*.pro.user
+*.pro.user.*
+CMakeLists.txt.user
+CMakeLists.txt.user.*
+
+# Compiled files
+*.o
+*.obj
+*.moc
+*.qm
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+
+# Qt generated
+*_automoc.cpp
+*_autogen/
+
+# Binary
+worklog-desktop
+
+# =============================================================================
+# Web App (.NET)
+# =============================================================================
+
+# Build results
+WorkLog.Web/**/bin/
+WorkLog.Web/**/obj/
+WorkLog.Web/**/out/
+
+# .NET
+*.dll
+*.exe
+*.pdb
+*.cache
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+*.vcxproj.user
+
+# Rider
+.idea/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+**/packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET
+ScaffoldingReadMe.txt
+
+# SQLite databases (local dev)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# =============================================================================
+# Docker
+# =============================================================================
+.docker/
+
+# =============================================================================
+# IDE / Editor
+# =============================================================================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains
+.idea/
+*.iml
+
+# Kate
+*.kate-swp
+.kateconfig
+
+# Vim
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# OS Generated
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# =============================================================================
+# Logs and temp files
+# =============================================================================
+*.log
+*.tmp
+*.temp
+logs/
