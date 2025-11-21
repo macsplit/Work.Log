@@ -137,17 +137,12 @@ QQC2.Dialog {
         }
 
         // Description
-        QQC2.ScrollView {
+        QQC2.TextField {
+            id: descriptionField
             Kirigami.FormData.label: i18n("Description:")
             Layout.fillWidth: true
-            implicitHeight: Kirigami.Units.gridUnit * 5
-
-            QQC2.TextArea {
-                id: descriptionField
-                text: root.description
-                placeholderText: i18n("Describe the work you did...")
-                wrapMode: TextEdit.Wrap
-            }
+            text: root.description
+            placeholderText: i18n("Describe the work you did...")
         }
 
         // Notes
@@ -161,6 +156,8 @@ QQC2.Dialog {
                 text: root.notes
                 placeholderText: i18n("Additional notes...")
                 wrapMode: TextEdit.Wrap
+                Keys.onTabPressed: nextStageField.forceActiveFocus()
+                Keys.onBacktabPressed: descriptionField.forceActiveFocus()
             }
         }
 
@@ -175,6 +172,8 @@ QQC2.Dialog {
                 text: root.nextPlannedStage
                 placeholderText: i18n("What's planned next...")
                 wrapMode: TextEdit.Wrap
+                Keys.onTabPressed: notesField.forceActiveFocus()
+                Keys.onBacktabPressed: notesField.forceActiveFocus()
             }
         }
     }
