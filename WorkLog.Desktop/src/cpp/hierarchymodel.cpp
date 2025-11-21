@@ -13,8 +13,43 @@ HierarchyModel::HierarchyModel(DatabaseManager *db, QObject *parent)
 
 void HierarchyModel::refresh()
 {
+    const int oldYear = m_selectedYear;
+    const int oldMonth = m_selectedMonth;
+    const int oldWeek = m_selectedWeek;
+
     m_years = m_database->getYears();
+
+    auto monthListForYear = [this](int year) {
+        return m_database->getMonthsForYear(year);
+    };
+    auto weekListForMonth = [this](int year, int month) {
+        return m_database->getWeeksForMonth(year, month);
+    };
+
+    // Restore selection if still valid; otherwise collapse upwards.
+    if (oldYear > 0 && m_years.contains(oldYear)) {
+        m_selectedYear = oldYear;
+
+        QVariantList months = monthListForYear(m_selectedYear);
+        if (oldMonth > 0 && months.contains(oldMonth)) {
+            m_selectedMonth = oldMonth;
+
+            QVariantList weeks = weekListForMonth(m_selectedYear, m_selectedMonth);
+            m_selectedWeek = (oldWeek > 0 && weeks.contains(oldWeek)) ? oldWeek : 0;
+        } else {
+            m_selectedMonth = 0;
+            m_selectedWeek = 0;
+        }
+    } else {
+        m_selectedYear = 0;
+        m_selectedMonth = 0;
+        m_selectedWeek = 0;
+    }
+
     emit yearsChanged();
+    emit selectedYearChanged();
+    emit selectedMonthChanged();
+    emit selectedWeekChanged();
     emit hierarchyChanged();
 }
 
