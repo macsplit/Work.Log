@@ -10,6 +10,7 @@
 #include "databasemanager.h"
 #include "worksessionmodel.h"
 #include "hierarchymodel.h"
+#include "tagmodel.h"
 
 int main(int argc, char *argv[])
 {
@@ -37,6 +38,7 @@ int main(int argc, char *argv[])
     // Create models
     WorkSessionModel *sessionModel = new WorkSessionModel(dbManager, &app);
     HierarchyModel *hierarchyModel = new HierarchyModel(dbManager, &app);
+    TagModel *tagModel = new TagModel(dbManager, &app);
 
     QQmlApplicationEngine engine;
 
@@ -44,6 +46,7 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("org.worklog", 1, 0, "Database", dbManager);
     qmlRegisterSingletonInstance("org.worklog", 1, 0, "SessionModel", sessionModel);
     qmlRegisterSingletonInstance("org.worklog", 1, 0, "HierarchyModel", hierarchyModel);
+    qmlRegisterSingletonInstance("org.worklog", 1, 0, "TagModel", tagModel);
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
 

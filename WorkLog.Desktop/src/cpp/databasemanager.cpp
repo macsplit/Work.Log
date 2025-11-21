@@ -44,6 +44,20 @@ bool DatabaseManager::createTables()
 {
     QSqlQuery query(m_database);
 
+    // Create Tags table
+    QString createTagsTable = QStringLiteral(R"(
+        CREATE TABLE IF NOT EXISTS Tags (
+            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+            Name TEXT NOT NULL UNIQUE
+        )
+    )");
+
+    if (!query.exec(createTagsTable)) {
+        qCritical() << "Failed to create Tags table:" << query.lastError().text();
+        emit errorOccurred(query.lastError().text());
+        return false;
+    }
+
     // Create WorkSessions table
     QString createTable = QStringLiteral(R"(
         CREATE TABLE IF NOT EXISTS WorkSessions (
@@ -53,8 +67,10 @@ bool DatabaseManager::createTables()
             Description TEXT NOT NULL,
             Notes TEXT,
             NextPlannedStage TEXT,
+            TagId INTEGER,
             CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
-            UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+            UpdatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (TagId) REFERENCES Tags(Id) ON DELETE SET NULL
         )
     )");
 
@@ -63,6 +79,9 @@ bool DatabaseManager::createTables()
         emit errorOccurred(query.lastError().text());
         return false;
     }
+
+    // Add TagId column if it doesn't exist (for existing databases)
+    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN TagId INTEGER REFERENCES Tags(Id) ON DELETE SET NULL"));
 
     // Create index for date queries
     QString createIndex = QStringLiteral(
@@ -84,12 +103,13 @@ QString DatabaseManager::databasePath() const
 bool DatabaseManager::createSession(const QDate &date, double timeHours,
                                     const QString &description,
                                     const QString &notes,
-                                    const QString &nextPlannedStage)
+                                    const QString &nextPlannedStage,
+                                    int tagId)
 {
     QSqlQuery query(m_database);
     query.prepare(QStringLiteral(R"(
-        INSERT INTO WorkSessions (SessionDate, TimeHours, Description, Notes, NextPlannedStage)
-        VALUES (:date, :hours, :desc, :notes, :next)
+        INSERT INTO WorkSessions (SessionDate, TimeHours, Description, Notes, NextPlannedStage, TagId)
+        VALUES (:date, :hours, :desc, :notes, :next, :tagId)
     )"));
 
     query.bindValue(QStringLiteral(":date"), date.toString(Qt::ISODate));
@@ -97,6 +117,7 @@ bool DatabaseManager::createSession(const QDate &date, double timeHours,
     query.bindValue(QStringLiteral(":desc"), description);
     query.bindValue(QStringLiteral(":notes"), notes.isEmpty() ? QVariant() : notes);
     query.bindValue(QStringLiteral(":next"), nextPlannedStage.isEmpty() ? QVariant() : nextPlannedStage);
+    query.bindValue(QStringLiteral(":tagId"), tagId > 0 ? tagId : QVariant());
 
     if (!query.exec()) {
         qWarning() << "Failed to create session:" << query.lastError().text();
@@ -111,13 +132,14 @@ bool DatabaseManager::createSession(const QDate &date, double timeHours,
 bool DatabaseManager::updateSession(int id, const QDate &date, double timeHours,
                                     const QString &description,
                                     const QString &notes,
-                                    const QString &nextPlannedStage)
+                                    const QString &nextPlannedStage,
+                                    int tagId)
 {
     QSqlQuery query(m_database);
     query.prepare(QStringLiteral(R"(
         UPDATE WorkSessions
         SET SessionDate = :date, TimeHours = :hours, Description = :desc,
-            Notes = :notes, NextPlannedStage = :next, UpdatedAt = datetime('now')
+            Notes = :notes, NextPlannedStage = :next, TagId = :tagId, UpdatedAt = datetime('now')
         WHERE Id = :id
     )"));
 
@@ -127,6 +149,7 @@ bool DatabaseManager::updateSession(int id, const QDate &date, double timeHours,
     query.bindValue(QStringLiteral(":desc"), description);
     query.bindValue(QStringLiteral(":notes"), notes.isEmpty() ? QVariant() : notes);
     query.bindValue(QStringLiteral(":next"), nextPlannedStage.isEmpty() ? QVariant() : nextPlannedStage);
+    query.bindValue(QStringLiteral(":tagId"), tagId > 0 ? tagId : QVariant());
 
     if (!query.exec()) {
         qWarning() << "Failed to update session:" << query.lastError().text();
@@ -158,7 +181,12 @@ QVariantMap DatabaseManager::getSession(int id)
 {
     QVariantMap result;
     QSqlQuery query(m_database);
-    query.prepare(QStringLiteral("SELECT * FROM WorkSessions WHERE Id = :id"));
+    query.prepare(QStringLiteral(R"(
+        SELECT ws.*, t.Name as TagName
+        FROM WorkSessions ws
+        LEFT JOIN Tags t ON ws.TagId = t.Id
+        WHERE ws.Id = :id
+    )"));
     query.bindValue(QStringLiteral(":id"), id);
 
     if (query.exec() && query.next()) {
@@ -169,6 +197,8 @@ QVariantMap DatabaseManager::getSession(int id)
         result[QStringLiteral("description")] = query.value(QStringLiteral("Description"));
         result[QStringLiteral("notes")] = query.value(QStringLiteral("Notes"));
         result[QStringLiteral("nextPlannedStage")] = query.value(QStringLiteral("NextPlannedStage"));
+        result[QStringLiteral("tagId")] = query.value(QStringLiteral("TagId"));
+        result[QStringLiteral("tagName")] = query.value(QStringLiteral("TagName"));
     }
 
     return result;
@@ -179,7 +209,11 @@ QVariantList DatabaseManager::getSessionsForDate(const QDate &date)
     QVariantList results;
     QSqlQuery query(m_database);
     query.prepare(QStringLiteral(R"(
-        SELECT * FROM WorkSessions WHERE SessionDate = :date ORDER BY CreatedAt ASC
+        SELECT ws.*, t.Name as TagName
+        FROM WorkSessions ws
+        LEFT JOIN Tags t ON ws.TagId = t.Id
+        WHERE ws.SessionDate = :date
+        ORDER BY ws.CreatedAt ASC
     )"));
     query.bindValue(QStringLiteral(":date"), date.toString(Qt::ISODate));
 
@@ -193,6 +227,8 @@ QVariantList DatabaseManager::getSessionsForDate(const QDate &date)
             session[QStringLiteral("description")] = query.value(QStringLiteral("Description"));
             session[QStringLiteral("notes")] = query.value(QStringLiteral("Notes"));
             session[QStringLiteral("nextPlannedStage")] = query.value(QStringLiteral("NextPlannedStage"));
+            session[QStringLiteral("tagId")] = query.value(QStringLiteral("TagId"));
+            session[QStringLiteral("tagName")] = query.value(QStringLiteral("TagName"));
             results.append(session);
         }
     }
@@ -305,4 +341,76 @@ QVariantList DatabaseManager::getDaysForMonth(int year, int month)
     }
 
     return results;
+}
+
+// Tag CRUD operations
+
+int DatabaseManager::createTag(const QString &name)
+{
+    if (name.trimmed().isEmpty()) {
+        return -1;
+    }
+
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral("INSERT INTO Tags (Name) VALUES (:name)"));
+    query.bindValue(QStringLiteral(":name"), name.trimmed());
+
+    if (!query.exec()) {
+        qWarning() << "Failed to create tag:" << query.lastError().text();
+        emit errorOccurred(query.lastError().text());
+        return -1;
+    }
+
+    emit tagsChanged();
+    return query.lastInsertId().toInt();
+}
+
+bool DatabaseManager::deleteTag(int id)
+{
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral("DELETE FROM Tags WHERE Id = :id"));
+    query.bindValue(QStringLiteral(":id"), id);
+
+    if (!query.exec()) {
+        qWarning() << "Failed to delete tag:" << query.lastError().text();
+        emit errorOccurred(query.lastError().text());
+        return false;
+    }
+
+    emit tagsChanged();
+    emit dataChanged(); // Sessions may have lost their tag
+    return true;
+}
+
+QVariantList DatabaseManager::getAllTags()
+{
+    QVariantList results;
+    QSqlQuery query(m_database);
+    query.exec(QStringLiteral("SELECT Id, Name FROM Tags ORDER BY Name ASC"));
+
+    while (query.next()) {
+        QVariantMap tag;
+        tag[QStringLiteral("id")] = query.value(0);
+        tag[QStringLiteral("name")] = query.value(1);
+        results.append(tag);
+    }
+
+    return results;
+}
+
+QString DatabaseManager::getTagName(int id)
+{
+    if (id <= 0) {
+        return QString();
+    }
+
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral("SELECT Name FROM Tags WHERE Id = :id"));
+    query.bindValue(QStringLiteral(":id"), id);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toString();
+    }
+
+    return QString();
 }

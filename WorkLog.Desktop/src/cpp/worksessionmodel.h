@@ -19,7 +19,9 @@ public:
         TimeHoursRole,
         DescriptionRole,
         NotesRole,
-        NextPlannedStageRole
+        NextPlannedStageRole,
+        TagIdRole,
+        TagNameRole
     };
 
     explicit WorkSessionModel(DatabaseManager *db, QObject *parent = nullptr);

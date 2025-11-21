@@ -55,6 +55,32 @@ Kirigami.Page {
             }
         }
 
+        // Tag
+        RowLayout {
+            visible: root.session && root.session.tagName && root.session.tagName.length > 0
+
+            Kirigami.Icon {
+                source: "tag"
+                implicitWidth: Kirigami.Units.iconSizes.small
+                implicitHeight: Kirigami.Units.iconSizes.small
+            }
+
+            Rectangle {
+                implicitWidth: sessionTagLabel.implicitWidth + Kirigami.Units.smallSpacing * 2
+                implicitHeight: sessionTagLabel.implicitHeight + Kirigami.Units.smallSpacing
+                radius: height / 2
+                color: Kirigami.Theme.highlightColor
+                opacity: 0.2
+
+                QQC2.Label {
+                    id: sessionTagLabel
+                    anchors.centerIn: parent
+                    text: root.session ? (root.session.tagName || "") : ""
+                    color: Kirigami.Theme.textColor
+                }
+            }
+        }
+
         Kirigami.Separator {
             Layout.fillWidth: true
         }

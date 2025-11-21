@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
 import org.kde.kirigami 2.19 as Kirigami
+import org.worklog 1.0
 
 QQC2.Dialog {
     id: root
@@ -12,6 +13,7 @@ QQC2.Dialog {
     property string description: ""
     property string notes: ""
     property string nextPlannedStage: ""
+    property int tagId: -1
 
     title: sessionId < 0 ? i18n("New Work Session") : i18n("Edit Work Session")
     modal: true
@@ -29,6 +31,7 @@ QQC2.Dialog {
         description = descriptionField.text
         notes = notesField.text
         nextPlannedStage = nextStageField.text
+        tagId = tagComboBox.currentIndex >= 0 ? TagModel.getIdByIndex(tagComboBox.currentIndex) : -1
     }
 
     contentItem: Kirigami.FormLayout {
@@ -93,6 +96,46 @@ QQC2.Dialog {
             }
         }
 
+        // Tag selection
+        RowLayout {
+            Kirigami.FormData.label: i18n("Tag (optional):")
+
+            QQC2.ComboBox {
+                id: tagComboBox
+                Layout.fillWidth: true
+                model: TagModel
+                textRole: "tagName"
+                currentIndex: TagModel.getIndexById(root.tagId)
+
+                displayText: currentIndex >= 0 ? currentText : i18n("No tag")
+
+                Component.onCompleted: {
+                    currentIndex = TagModel.getIndexById(root.tagId)
+                }
+
+                // Allow clearing the selection
+                onActivated: {
+                    if (index < 0) {
+                        currentIndex = -1
+                    }
+                }
+            }
+
+            QQC2.Button {
+                icon.name: "tag-edit"
+                text: i18n("Clear")
+                visible: tagComboBox.currentIndex >= 0
+                onClicked: tagComboBox.currentIndex = -1
+            }
+
+            QQC2.Button {
+                icon.name: "tag-new"
+                QQC2.ToolTip.text: i18n("Manage Tags")
+                QQC2.ToolTip.visible: hovered
+                onClicked: tagManagementDialog.open()
+            }
+        }
+
         // Description
         QQC2.TextArea {
             id: descriptionField
@@ -125,5 +168,9 @@ QQC2.Dialog {
             placeholderText: i18n("What's planned next...")
             wrapMode: TextEdit.Wrap
         }
+    }
+
+    TagManagementDialog {
+        id: tagManagementDialog
     }
 }

@@ -25,6 +25,7 @@ set(worklog_SRCS
     src/cpp/databasemanager.cpp
     src/cpp/worksessionmodel.cpp
     src/cpp/hierarchymodel.cpp
+    src/cpp/tagmodel.cpp
 )
 
 # Qt resources

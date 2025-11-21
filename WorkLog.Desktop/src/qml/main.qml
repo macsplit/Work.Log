@@ -32,6 +32,7 @@ Kirigami.ApplicationWindow {
                     editDialog.description = ""
                     editDialog.notes = ""
                     editDialog.nextPlannedStage = ""
+                    editDialog.tagId = -1
                     editDialog.open()
                 }
             }
@@ -87,6 +88,7 @@ Kirigami.ApplicationWindow {
                         editDialog.description = session.description
                         editDialog.notes = session.notes || ""
                         editDialog.nextPlannedStage = session.nextPlannedStage || ""
+                        editDialog.tagId = session.tagId || -1
                         editDialog.open()
                     }
                 }
@@ -110,6 +112,7 @@ Kirigami.ApplicationWindow {
                             editDialog.description = root.selectedSession.description
                             editDialog.notes = root.selectedSession.notes || ""
                             editDialog.nextPlannedStage = root.selectedSession.nextPlannedStage || ""
+                            editDialog.tagId = root.selectedSession.tagId || -1
                             editDialog.open()
                         }
                     }
@@ -127,9 +130,9 @@ Kirigami.ApplicationWindow {
         id: editDialog
         onAccepted: {
             if (sessionId < 0) {
-                Database.createSession(sessionDate, timeHours, description, notes, nextPlannedStage)
+                Database.createSession(sessionDate, timeHours, description, notes, nextPlannedStage, tagId)
             } else {
-                Database.updateSession(sessionId, sessionDate, timeHours, description, notes, nextPlannedStage)
+                Database.updateSession(sessionId, sessionDate, timeHours, description, notes, nextPlannedStage, tagId)
             }
         }
     }

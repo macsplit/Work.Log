@@ -37,6 +37,10 @@ QVariant WorkSessionModel::data(const QModelIndex &index, int role) const
         return session.value(QStringLiteral("notes"));
     case NextPlannedStageRole:
         return session.value(QStringLiteral("nextPlannedStage"));
+    case TagIdRole:
+        return session.value(QStringLiteral("tagId"));
+    case TagNameRole:
+        return session.value(QStringLiteral("tagName"));
     default:
         return QVariant();
     }
@@ -50,7 +54,9 @@ QHash<int, QByteArray> WorkSessionModel::roleNames() const
         {TimeHoursRole, "timeHours"},
         {DescriptionRole, "description"},
         {NotesRole, "notes"},
-        {NextPlannedStageRole, "nextPlannedStage"}
+        {NextPlannedStageRole, "nextPlannedStage"},
+        {TagIdRole, "tagId"},
+        {TagNameRole, "tagName"}
     };
 }
 
