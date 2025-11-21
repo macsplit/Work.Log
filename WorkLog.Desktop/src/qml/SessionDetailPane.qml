@@ -132,11 +132,34 @@ Kirigami.Page {
     }
 
     // Placeholder when no session selected
-    Kirigami.PlaceholderMessage {
+    ColumnLayout {
         anchors.centerIn: parent
         visible: root.session === null
-        text: i18n("No session selected")
-        explanation: i18n("Select a session from the list to view its details")
-        icon.name: "document-preview"
+        spacing: Kirigami.Units.smallSpacing
+        width: Math.min(parent.width * 0.8, Kirigami.Units.gridUnit * 18)
+
+        Kirigami.Icon {
+            source: "document-preview"
+            Layout.alignment: Qt.AlignHCenter
+            implicitWidth: Kirigami.Units.iconSizes.large
+            implicitHeight: Kirigami.Units.iconSizes.large
+        }
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignHCenter
+            wrapMode: Text.Wrap
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 0.9
+            text: i18n("No session selected")
+        }
+
+        QQC2.Label {
+            Layout.alignment: Qt.AlignHCenter
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
+            horizontalAlignment: Text.AlignHCenter
+            font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 0.85
+            text: i18n("Select a session from the list to view its details.")
+        }
     }
 }
