@@ -125,12 +125,36 @@ Kirigami.ScrollablePage {
             }
         }
 
-        Kirigami.PlaceholderMessage {
+        ColumnLayout {
             anchors.centerIn: parent
             visible: SessionModel.count === 0
-            text: i18n("No sessions for this day")
-            explanation: i18n("Click the + button to add a work session")
-            icon.name: "appointment-new"
+            spacing: Kirigami.Units.smallSpacing
+            width: Math.min(parent.width * 0.8, Kirigami.Units.gridUnit * 18)
+
+            Kirigami.Icon {
+                source: "appointment-new"
+                Layout.alignment: Qt.AlignHCenter
+                implicitWidth: Kirigami.Units.iconSizes.large
+                implicitHeight: Kirigami.Units.iconSizes.large
+            }
+
+            QQC2.Label {
+                Layout.alignment: Qt.AlignHCenter
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 0.9
+                text: i18n("No sessions for this day")
+            }
+
+            QQC2.Label {
+                Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 0.85
+                text: i18n("Click the + button to add a work session")
+                opacity: 0.7
+            }
         }
     }
 
