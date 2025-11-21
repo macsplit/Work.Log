@@ -61,7 +61,11 @@ Kirigami.ScrollablePage {
             }
 
             Repeater {
-                model: HierarchyModel.getMonths()
+                // Explicit dependency on selectedYear to trigger re-evaluation
+                model: {
+                    var year = HierarchyModel.selectedYear;
+                    return year > 0 ? HierarchyModel.getMonths() : [];
+                }
 
                 QQC2.ItemDelegate {
                     Layout.fillWidth: true
@@ -91,7 +95,11 @@ Kirigami.ScrollablePage {
             }
 
             Repeater {
-                model: HierarchyModel.getWeeks()
+                // Explicit dependency on selectedMonth to trigger re-evaluation
+                model: {
+                    var month = HierarchyModel.selectedMonth;
+                    return month > 0 ? HierarchyModel.getWeeks() : [];
+                }
 
                 QQC2.ItemDelegate {
                     Layout.fillWidth: true
@@ -121,7 +129,12 @@ Kirigami.ScrollablePage {
             }
 
             Repeater {
-                model: HierarchyModel.getDays()
+                // Explicit dependency on selectedMonth/selectedWeek to trigger re-evaluation
+                model: {
+                    var month = HierarchyModel.selectedMonth;
+                    var week = HierarchyModel.selectedWeek;
+                    return month > 0 ? HierarchyModel.getDays() : [];
+                }
 
                 QQC2.ItemDelegate {
                     Layout.fillWidth: true
