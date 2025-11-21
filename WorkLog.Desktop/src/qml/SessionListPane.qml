@@ -50,7 +50,8 @@ Kirigami.ScrollablePage {
                     QQC2.Label {
                         text: model.timeHours + "h"
                         font.bold: true
-                        color: Kirigami.Theme.highlightColor
+                        // Use contrasting color when item is highlighted
+                        color: sessionDelegate.highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.highlightColor
                     }
 
                     Item { Layout.fillWidth: true }
