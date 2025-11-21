@@ -149,16 +149,29 @@ Kirigami.ApplicationWindow {
         standardButtons: QQC2.Dialog.Yes | QQC2.Dialog.No
         anchors.centerIn: parent
 
-        contentItem: QQC2.Label {
-            text: session
-                  ? i18n("Delete session on %1: %2",
-                         Qt.formatDate(session.date, "yyyy-MM-dd"),
-                         session.description && session.description.length > 60
-                             ? session.description.slice(0, 57) + "…"
-                             : (session.description || i18n("(no description)")))
-                  : i18n("Delete this session?")
-            wrapMode: Text.Wrap
-            verticalAlignment: Text.AlignVCenter
+        contentItem: ColumnLayout {
+            spacing: Kirigami.Units.smallSpacing
+            Layout.preferredWidth: Kirigami.Units.gridUnit * 18
+            Layout.preferredHeight: implicitHeight
+
+            QQC2.Label {
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                text: deleteDialog.session
+                      ? i18n("Delete session on %1:", Qt.formatDate(deleteDialog.session.date, "yyyy-MM-dd"))
+                      : i18n("Delete this session?")
+            }
+
+            QQC2.Label {
+                Layout.fillWidth: true
+                wrapMode: Text.Wrap
+                opacity: 0.7
+                text: deleteDialog.session
+                      ? (deleteDialog.session.description && deleteDialog.session.description.length > 60
+                            ? deleteDialog.session.description.slice(0, 57) + "…"
+                            : (deleteDialog.session.description || i18n("(no description)")))
+                      : ""
+            }
         }
 
         onAccepted: {
