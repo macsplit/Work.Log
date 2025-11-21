@@ -91,6 +91,10 @@ Kirigami.ApplicationWindow {
                         editDialog.tagId = session.tagId || -1
                         editDialog.open()
                     }
+                    onDeleteSession: {
+                        deleteDialog.session = session
+                        deleteDialog.open()
+                    }
                 }
 
                 Kirigami.Separator {
@@ -138,20 +142,34 @@ Kirigami.ApplicationWindow {
     }
 
     QQC2.Dialog {
-        id: deleteConfirmDialog
+        id: deleteDialog
+        property var session: null
         title: i18n("Delete Session")
         modal: true
         standardButtons: QQC2.Dialog.Yes | QQC2.Dialog.No
         anchors.centerIn: parent
 
-        QQC2.Label {
-            text: i18n("Are you sure you want to delete this work session?")
+        contentItem: QQC2.Label {
+            text: session
+                  ? i18n("Delete session on %1: %2",
+                         Qt.formatDate(session.date, "yyyy-MM-dd"),
+                         session.description && session.description.length > 60
+                             ? session.description.slice(0, 57) + "…"
+                             : (session.description || i18n("(no description)")))
+                  : i18n("Delete this session?")
+            wrapMode: Text.Wrap
+            verticalAlignment: Text.AlignVCenter
         }
 
         onAccepted: {
-            if (root.selectedSession) {
-                Database.deleteSession(root.selectedSession.id)
-                root.selectedSession = null
+            if (session) {
+                Database.deleteSession(session.id)
+                // refresh models and hierarchy
+                HierarchyModel.refresh()
+                SessionModel.refresh()
+                if (root.selectedSession && root.selectedSession.id === session.id) {
+                    root.selectedSession = null
+                }
             }
         }
     }

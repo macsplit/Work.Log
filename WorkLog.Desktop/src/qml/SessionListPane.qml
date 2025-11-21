@@ -12,6 +12,7 @@ Kirigami.ScrollablePage {
 
     signal sessionSelected(var session)
     signal editSession(var session)
+    signal deleteSession(var session)
 
     title: Qt.formatDate(currentDate, "dddd, MMMM d, yyyy")
     leftPadding: Kirigami.Units.smallSpacing
@@ -82,6 +83,17 @@ Kirigami.ScrollablePage {
                         onClicked: {
                             var session = SessionModel.get(index)
                             root.editSession(session)
+                        }
+                    }
+
+                    QQC2.ToolButton {
+                        icon.name: "edit-delete"
+                        display: QQC2.AbstractButton.IconOnly
+                        QQC2.ToolTip.text: i18n("Delete")
+                        QQC2.ToolTip.visible: hovered
+                        onClicked: {
+                            var session = SessionModel.get(index)
+                            root.deleteSession(session)
                         }
                     }
                 }
