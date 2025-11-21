@@ -69,14 +69,15 @@ Kirigami.Page {
                 implicitWidth: sessionTagLabel.implicitWidth + Kirigami.Units.smallSpacing * 2
                 implicitHeight: sessionTagLabel.implicitHeight + Kirigami.Units.smallSpacing
                 radius: height / 2
-                color: Kirigami.Theme.highlightColor
-                opacity: 0.6
+                color: "transparent"
+                border.width: 1
+                border.color: Kirigami.Theme.highlightColor
 
                 QQC2.Label {
                     id: sessionTagLabel
                     anchors.centerIn: parent
                     text: root.session ? (root.session.tagName || "") : ""
-                    color: Kirigami.Theme.textColor
+                    color: Kirigami.Theme.highlightColor
                     font.bold: true
                 }
             }

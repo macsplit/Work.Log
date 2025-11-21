@@ -61,15 +61,17 @@ Kirigami.ScrollablePage {
                         implicitWidth: tagLabel.implicitWidth + Kirigami.Units.smallSpacing * 2
                         implicitHeight: tagLabel.implicitHeight + Kirigami.Units.smallSpacing
                         radius: height / 2
-                        color: Kirigami.Theme.highlightColor
-                        opacity: sessionDelegate.highlighted ? 0.5 : 0.28
+                        color: "transparent"
+                        border.width: 1
+                        border.color: sessionDelegate.highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.highlightColor
 
                         QQC2.Label {
                             id: tagLabel
                             anchors.centerIn: parent
                             text: model.tagName || ""
                             font.pixelSize: Kirigami.Theme.smallFont.pixelSize
-                            color: sessionDelegate.highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                            font.bold: true
+                            color: sessionDelegate.highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.highlightColor
                         }
                     }
 
