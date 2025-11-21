@@ -36,7 +36,7 @@
                     <select asp-for="TagId" asp-items="Model.AvailableTags" class="form-control">
                         <option value="">No tag</option>
                     </select>
-                    <a asp-controller="Tag" asp-action="Index" class="btn btn-sm btn-secondary">Manage Tags</a>
+                    <button type="button" class="btn btn-sm btn-secondary" onclick="openTagManager()">Manage Tags</button>
                 </div>
             </div>
 

@@ -31,6 +31,18 @@
         <p>&copy; @DateTime.Now.Year Work Log</p>
     </footer>
 
+    <!-- Modal container -->
+    <div id="modal-backdrop" class="modal-backdrop" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h2 id="modal-title">Modal</h2>
+                <button type="button" class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-content" class="modal-content">
+            </div>
+        </div>
+    </div>
+
     <script src="~/js/site.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

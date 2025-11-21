@@ -33,8 +33,16 @@ public class TagController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(string name)
     {
+        var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                     Request.Headers["Accept"].ToString().Contains("application/json") ||
+                     Request.ContentType?.Contains("multipart/form-data") == true;
+
         if (string.IsNullOrWhiteSpace(name))
         {
+            if (isAjax)
+            {
+                return BadRequest(new { error = "Tag name is required." });
+            }
             TempData["Error"] = "Tag name is required.";
             return RedirectToAction(nameof(Index));
         }
@@ -44,9 +52,18 @@ public class TagController : Controller
 
         if (result == null)
         {
+            if (isAjax)
+            {
+                return BadRequest(new { error = "Tag already exists or could not be created." });
+            }
             TempData["Error"] = "Tag already exists or could not be created.";
+            return RedirectToAction(nameof(Index));
         }
 
+        if (isAjax)
+        {
+            return Json(new { id = result.Id, name = result.Name });
+        }
         return RedirectToAction(nameof(Index));
     }
 
@@ -55,7 +72,16 @@ public class TagController : Controller
     public async Task<IActionResult> Delete(int id)
     {
         var userId = GetCurrentUserId();
-        await _tagService.DeleteTag(id, userId);
+        var success = await _tagService.DeleteTag(id, userId);
+
+        var isAjax = Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                     Request.Headers["Accept"].ToString().Contains("application/json") ||
+                     Request.ContentType?.Contains("multipart/form-data") == true;
+
+        if (isAjax)
+        {
+            return success ? Ok() : NotFound();
+        }
         return RedirectToAction(nameof(Index));
     }
 
