@@ -141,7 +141,8 @@ QQC2.Dialog {
             id: descriptionField
             Kirigami.FormData.label: i18n("Description:")
             Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 4
+            Layout.minimumHeight: Kirigami.Units.gridUnit * 4
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 5
             text: root.description
             placeholderText: i18n("Describe the work you did...")
             wrapMode: TextEdit.Wrap
@@ -152,7 +153,8 @@ QQC2.Dialog {
             id: notesField
             Kirigami.FormData.label: i18n("Notes (optional):")
             Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
+            Layout.minimumHeight: Kirigami.Units.gridUnit * 3
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 4
             text: root.notes
             placeholderText: i18n("Additional notes...")
             wrapMode: TextEdit.Wrap
@@ -163,7 +165,8 @@ QQC2.Dialog {
             id: nextStageField
             Kirigami.FormData.label: i18n("Next Planned Stage (optional):")
             Layout.fillWidth: true
-            Layout.preferredHeight: Kirigami.Units.gridUnit * 2
+            Layout.minimumHeight: Kirigami.Units.gridUnit * 3
+            Layout.preferredHeight: Kirigami.Units.gridUnit * 3
             text: root.nextPlannedStage
             placeholderText: i18n("What's planned next...")
             wrapMode: TextEdit.Wrap
