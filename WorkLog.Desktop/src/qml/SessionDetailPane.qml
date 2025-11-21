@@ -70,13 +70,14 @@ Kirigami.Page {
                 implicitHeight: sessionTagLabel.implicitHeight + Kirigami.Units.smallSpacing
                 radius: height / 2
                 color: Kirigami.Theme.highlightColor
-                opacity: 0.2
+                opacity: 0.6
 
                 QQC2.Label {
                     id: sessionTagLabel
                     anchors.centerIn: parent
                     text: root.session ? (root.session.tagName || "") : ""
                     color: Kirigami.Theme.textColor
+                    font.bold: true
                 }
             }
         }
