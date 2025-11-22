@@ -37,7 +37,7 @@ Kirigami.ScrollablePage {
             model: HierarchyModel.years
 
             Column {
-                width: parent.width
+                Layout.fillWidth: true
 
                 property int yearValue: modelData
                 property bool isExpanded: HierarchyModel.selectedYear === yearValue
@@ -63,13 +63,12 @@ Kirigami.ScrollablePage {
                 Column {
                     visible: isExpanded
                     width: parent.width
-                    leftPadding: Kirigami.Units.gridUnit
 
                     Repeater {
                         model: isExpanded ? HierarchyModel.getMonths() : []
 
                         Column {
-                            width: parent.width - Kirigami.Units.gridUnit
+                            width: parent.width
 
                             property int monthValue: modelData
                             property bool monthExpanded: HierarchyModel.selectedMonth === monthValue
@@ -77,6 +76,7 @@ Kirigami.ScrollablePage {
                             // Month item
                             QQC2.ItemDelegate {
                                 width: parent.width
+                                leftPadding: Kirigami.Units.gridUnit
                                 text: i18n("%1 (%2h/wk)",
                                            HierarchyModel.monthName(monthValue),
                                            HierarchyModel.monthAverageHoursPerWeek(monthValue).toFixed(1))
@@ -95,13 +95,12 @@ Kirigami.ScrollablePage {
                             Column {
                                 visible: monthExpanded
                                 width: parent.width
-                                leftPadding: Kirigami.Units.gridUnit
 
                                 Repeater {
                                     model: monthExpanded ? HierarchyModel.getWeeks() : []
 
                                     Column {
-                                        width: parent.width - Kirigami.Units.gridUnit
+                                        width: parent.width
 
                                         property int weekValue: modelData
                                         property bool weekExpanded: HierarchyModel.selectedWeek === weekValue
@@ -109,6 +108,7 @@ Kirigami.ScrollablePage {
                                         // Week item
                                         QQC2.ItemDelegate {
                                             width: parent.width
+                                            leftPadding: Kirigami.Units.gridUnit * 2
                                             text: i18n("%1 (%2h)",
                                                        HierarchyModel.weekLabel(weekValue),
                                                        HierarchyModel.weekTotalHours(weekValue).toFixed(1))
@@ -127,13 +127,13 @@ Kirigami.ScrollablePage {
                                         Column {
                                             visible: weekExpanded
                                             width: parent.width
-                                            leftPadding: Kirigami.Units.gridUnit
 
                                             Repeater {
                                                 model: weekExpanded ? HierarchyModel.getDays() : []
 
                                                 QQC2.ItemDelegate {
-                                                    width: parent.width - Kirigami.Units.gridUnit
+                                                    width: parent.width
+                                                    leftPadding: Kirigami.Units.gridUnit * 3
                                                     property date itemDate: modelData
                                                     text: i18n("%1 (%2h)",
                                                                Qt.formatDate(itemDate, "ddd, MMM d"),
