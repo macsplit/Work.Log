@@ -36,7 +36,6 @@ Work.Log/
 │   ├── Dockerfile
 │   ├── docker-compose.yml    # Development
 │   └── docker-compose.prod.yml # Production
-├── CLAUDE.md                 # AI assistant instructions
 └── README.md                 # This file
 ```
 
