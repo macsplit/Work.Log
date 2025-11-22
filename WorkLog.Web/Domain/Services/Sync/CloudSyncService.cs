@@ -6,6 +6,7 @@ using Amazon.Runtime;
 using Microsoft.EntityFrameworkCore;
 using WorkLog.Domain.Data;
 using WorkLog.Domain.Entities;
+using Tag = WorkLog.Domain.Entities.Tag;
 
 namespace WorkLog.Domain.Services.Sync;
 

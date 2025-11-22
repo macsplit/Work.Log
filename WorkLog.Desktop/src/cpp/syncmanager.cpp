@@ -36,6 +36,11 @@ QString SyncManager::configFilePath() const
 
 void SyncManager::loadConfiguration()
 {
+    // Set defaults first
+    m_config.sessionsTableName = QStringLiteral("WorkLog_Sessions");
+    m_config.tagsTableName = QStringLiteral("WorkLog_Tags");
+    m_config.awsRegion = QStringLiteral("us-east-1");
+
     QFile file(configFilePath());
     if (!file.open(QIODevice::ReadOnly)) {
         return;
@@ -46,10 +51,20 @@ void SyncManager::loadConfiguration()
 
     m_config.awsAccessKeyId = obj[QStringLiteral("AwsAccessKeyId")].toString();
     m_config.awsSecretAccessKey = obj[QStringLiteral("AwsSecretAccessKey")].toString();
-    m_config.awsRegion = obj[QStringLiteral("AwsRegion")].toString(QStringLiteral("us-east-1"));
+
+    if (obj.contains(QStringLiteral("AwsRegion")) && !obj[QStringLiteral("AwsRegion")].toString().isEmpty()) {
+        m_config.awsRegion = obj[QStringLiteral("AwsRegion")].toString();
+    }
     m_config.profileId = obj[QStringLiteral("ProfileId")].toString();
-    m_config.sessionsTableName = obj[QStringLiteral("SessionsTableName")].toString(QStringLiteral("WorkLog_Sessions"));
-    m_config.tagsTableName = obj[QStringLiteral("TagsTableName")].toString(QStringLiteral("WorkLog_Tags"));
+
+    if (obj.contains(QStringLiteral("SessionsTableName")) && !obj[QStringLiteral("SessionsTableName")].toString().isEmpty()) {
+        m_config.sessionsTableName = obj[QStringLiteral("SessionsTableName")].toString();
+    }
+    if (obj.contains(QStringLiteral("TagsTableName")) && !obj[QStringLiteral("TagsTableName")].toString().isEmpty()) {
+        m_config.tagsTableName = obj[QStringLiteral("TagsTableName")].toString();
+    }
+
+    qDebug() << "Loaded config - Tables:" << m_config.sessionsTableName << m_config.tagsTableName;
 
     emit configurationChanged();
 }
@@ -193,6 +208,14 @@ void SyncManager::testConnection()
     payload[QStringLiteral("TableName")] = m_config.sessionsTableName;
     QByteArray payloadBytes = QJsonDocument(payload).toJson(QJsonDocument::Compact);
 
+    qDebug() << "=== Test Connection Debug ===";
+    qDebug() << "Host:" << host;
+    qDebug() << "URL:" << url;
+    qDebug() << "Region:" << m_config.awsRegion;
+    qDebug() << "Table:" << m_config.sessionsTableName;
+    qDebug() << "Payload:" << payloadBytes;
+    qDebug() << "Timestamp:" << timestamp.toString(QStringLiteral("yyyyMMddTHHmmssZ"));
+
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/x-amz-json-1.0"));
     request.setRawHeader("X-Amz-Target", amzTarget.toLatin1());
@@ -202,6 +225,8 @@ void SyncManager::testConnection()
     QString authHeader = signRequest(QStringLiteral("POST"), QStringLiteral("dynamodb"),
                                      host, QStringLiteral("/"), QString::fromUtf8(payloadBytes), timestamp, amzTarget);
     request.setRawHeader("Authorization", authHeader.toLatin1());
+
+    qDebug() << "Authorization:" << authHeader;
 
     request.setAttribute(QNetworkRequest::User, QStringLiteral("test"));
 
@@ -276,6 +301,11 @@ void SyncManager::onSyncRequestFinished(QNetworkReply *reply)
 {
     QString operation = reply->request().attribute(QNetworkRequest::User).toString();
     QByteArray responseData = reply->readAll();
+
+    qDebug() << "=== Response Debug ===";
+    qDebug() << "Operation:" << operation;
+    qDebug() << "HTTP Status:" << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    qDebug() << "Response:" << responseData;
 
     if (reply->error() != QNetworkReply::NoError) {
         QString errorMsg = reply->errorString();
@@ -696,6 +726,14 @@ QString SyncManager::signRequest(const QString &method, const QString &service,
         + canonicalHeaders + QStringLiteral("\n")
         + signedHeaders + QStringLiteral("\n")
         + payloadHash;
+
+    qDebug() << "=== AWS Signature Debug ===";
+    qDebug() << "amzDate:" << amzDate;
+    qDebug() << "dateStamp:" << dateStamp;
+    qDebug() << "amzTarget:" << amzTarget;
+    qDebug() << "payloadHash:" << payloadHash;
+    qDebug() << "Canonical Headers:" << canonicalHeaders;
+    qDebug() << "Canonical Request:\n" << canonicalRequest;
 
     // Create string to sign
     QString algorithm = QStringLiteral("AWS4-HMAC-SHA256");
