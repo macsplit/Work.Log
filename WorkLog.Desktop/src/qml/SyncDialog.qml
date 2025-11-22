@@ -10,9 +10,16 @@ QQC2.Dialog {
     modal: true
     anchors.centerIn: parent
     width: Math.min(parent.width * 0.8, Kirigami.Units.gridUnit * 28)
+    height: contentColumn.implicitHeight + Kirigami.Units.gridUnit * 6
     standardButtons: QQC2.Dialog.Close
 
     property bool configMode: !SyncManager.isConfigured
+
+    onOpened: {
+        // Reset state on open to ensure proper layout
+        resultLabel.visible = false
+        configMode = !SyncManager.isConfigured
+    }
 
     Connections {
         target: SyncManager
@@ -27,6 +34,7 @@ QQC2.Dialog {
     }
 
     contentItem: ColumnLayout {
+        id: contentColumn
         spacing: Kirigami.Units.largeSpacing
 
         // Status Section
