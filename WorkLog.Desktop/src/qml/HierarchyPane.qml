@@ -13,14 +13,15 @@ Kirigami.ScrollablePage {
     leftPadding: Kirigami.Units.smallSpacing
     rightPadding: Kirigami.Units.smallSpacing
 
-    ColumnLayout {
+    Column {
+        width: parent.width
         spacing: 0
 
         // Header
         Kirigami.Heading {
             level: 4
             text: i18n("Years")
-            Layout.bottomMargin: Kirigami.Units.smallSpacing
+            bottomPadding: Kirigami.Units.smallSpacing
         }
 
         // Placeholder when no data
@@ -28,7 +29,7 @@ Kirigami.ScrollablePage {
             visible: HierarchyModel.years.length === 0
             text: i18n("No sessions recorded yet")
             opacity: 0.6
-            Layout.fillWidth: true
+            width: parent.width
             wrapMode: Text.Wrap
         }
 
@@ -37,7 +38,7 @@ Kirigami.ScrollablePage {
             model: HierarchyModel.years
 
             Column {
-                Layout.fillWidth: true
+                width: parent.width
 
                 property int yearValue: modelData
                 property bool isExpanded: HierarchyModel.selectedYear === yearValue
@@ -152,10 +153,6 @@ Kirigami.ScrollablePage {
                     }
                 }
             }
-        }
-
-        Item {
-            Layout.fillHeight: true
         }
     }
 }
