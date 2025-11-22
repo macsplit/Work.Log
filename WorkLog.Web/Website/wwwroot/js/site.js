@@ -16,9 +16,12 @@ window.addEventListener('popstate', function(e) {
 // AJAX navigation to prevent dark mode flash
 function initAjaxNavigation() {
     document.addEventListener('click', function(e) {
-        // Find if click was on a tree navigation link
-        const link = e.target.closest('.hierarchy-panel a:not([target])');
+        // Find if click was on any internal link (not buttons, not form submits)
+        const link = e.target.closest('a:not([target]):not([download])');
         if (!link) return;
+
+        // Skip links inside forms or with special roles
+        if (link.closest('form')) return;
 
         // Skip if modifier keys pressed (user wants new tab etc)
         if (e.ctrlKey || e.metaKey || e.shiftKey) return;
@@ -48,24 +51,29 @@ async function loadPageContent(url, pushState) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
 
-        // Update hierarchy panel
+        // Check if both pages have the dashboard layout (hierarchy + content panels)
         const newHierarchy = doc.querySelector('.hierarchy-panel');
         const oldHierarchy = document.querySelector('.hierarchy-panel');
-        if (newHierarchy && oldHierarchy) {
-            // Preserve scroll position
+        const newContent = doc.querySelector('.content-panel');
+        const oldContent = document.querySelector('.content-panel');
+
+        if (newHierarchy && oldHierarchy && newContent && oldContent) {
+            // Same layout - just update panels
             const scrollTop = oldHierarchy.scrollTop;
             oldHierarchy.innerHTML = newHierarchy.innerHTML;
             oldHierarchy.scrollTop = scrollTop;
+            oldContent.innerHTML = newContent.innerHTML;
+        } else {
+            // Different layout - replace entire main content
+            const newMain = doc.querySelector('.main-content');
+            const oldMain = document.querySelector('.main-content');
+            if (newMain && oldMain) {
+                oldMain.innerHTML = newMain.innerHTML;
+            }
         }
 
-        // Update content panel
-        const newContent = doc.querySelector('.content-panel');
-        const oldContent = document.querySelector('.content-panel');
-        if (newContent && oldContent) {
-            oldContent.innerHTML = newContent.innerHTML;
-            // Re-render markdown in new content
-            renderSessionNotesMarkdown();
-        }
+        // Re-render markdown in new content
+        renderSessionNotesMarkdown();
 
         // Update page title
         const newTitle = doc.querySelector('title');
@@ -76,6 +84,11 @@ async function loadPageContent(url, pushState) {
         // Update URL
         if (pushState) {
             history.pushState({ ajax: true }, '', url);
+        }
+
+        // Scroll to top for new pages
+        if (!newHierarchy || !oldHierarchy) {
+            window.scrollTo(0, 0);
         }
     } catch (error) {
         console.error('AJAX navigation failed:', error);
