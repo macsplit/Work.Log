@@ -54,7 +54,7 @@ private:
     QVariantList m_years;
     int m_selectedYear = 0;
     int m_selectedMonth = 0;
-    int m_selectedWeek = 0;
+    int m_selectedWeek = -1;  // -1 means no selection, 0+ are valid week numbers
 };
 
 #endif // HIERARCHYMODEL_H

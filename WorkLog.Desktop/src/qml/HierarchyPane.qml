@@ -117,7 +117,7 @@ Kirigami.ScrollablePage {
                                             icon.name: weekExpanded ? "go-down" : "go-next"
                                             onClicked: {
                                                 if (HierarchyModel.selectedWeek === weekValue) {
-                                                    HierarchyModel.selectedWeek = 0
+                                                    HierarchyModel.selectedWeek = -1
                                                 } else {
                                                     HierarchyModel.selectedWeek = weekValue
                                                 }

@@ -27,6 +27,7 @@ void HierarchyModel::refresh()
     };
 
     // Restore selection if still valid; otherwise collapse upwards.
+    // Note: -1 means "no selection", 0+ are valid week numbers
     if (oldYear > 0 && m_years.contains(oldYear)) {
         m_selectedYear = oldYear;
 
@@ -35,15 +36,15 @@ void HierarchyModel::refresh()
             m_selectedMonth = oldMonth;
 
             QVariantList weeks = weekListForMonth(m_selectedYear, m_selectedMonth);
-            m_selectedWeek = (oldWeek > 0 && weeks.contains(oldWeek)) ? oldWeek : 0;
+            m_selectedWeek = (oldWeek >= 0 && weeks.contains(oldWeek)) ? oldWeek : -1;
         } else {
             m_selectedMonth = 0;
-            m_selectedWeek = 0;
+            m_selectedWeek = -1;
         }
     } else {
         m_selectedYear = 0;
         m_selectedMonth = 0;
-        m_selectedWeek = 0;
+        m_selectedWeek = -1;
     }
 
     emit yearsChanged();
@@ -73,7 +74,7 @@ void HierarchyModel::setSelectedYear(int year)
     if (m_selectedYear != year) {
         m_selectedYear = year;
         m_selectedMonth = 0;
-        m_selectedWeek = 0;
+        m_selectedWeek = -1;
         emit selectedYearChanged();
         emit selectedMonthChanged();
         emit selectedWeekChanged();
@@ -90,7 +91,7 @@ void HierarchyModel::setSelectedMonth(int month)
 {
     if (m_selectedMonth != month) {
         m_selectedMonth = month;
-        m_selectedWeek = 0;
+        m_selectedWeek = -1;
         emit selectedMonthChanged();
         emit selectedWeekChanged();
         emit hierarchyChanged();
@@ -130,7 +131,8 @@ QVariantList HierarchyModel::getDays() const
     if (m_selectedYear == 0 || m_selectedMonth == 0)
         return QVariantList();
 
-    if (m_selectedWeek > 0) {
+    // -1 means no week selected, 0+ are valid week numbers
+    if (m_selectedWeek >= 0) {
         return m_database->getDaysForWeek(m_selectedYear, m_selectedWeek);
     }
     return m_database->getDaysForMonth(m_selectedYear, m_selectedMonth);
