@@ -10,7 +10,6 @@ QQC2.Dialog {
     modal: true
     anchors.centerIn: parent
     width: Math.min(parent.width * 0.8, Kirigami.Units.gridUnit * 28)
-    height: contentColumn.implicitHeight + Kirigami.Units.gridUnit * 6
     standardButtons: QQC2.Dialog.Close
 
     property bool configMode: !SyncManager.isConfigured
@@ -33,13 +32,15 @@ QQC2.Dialog {
         }
     }
 
-    contentItem: ColumnLayout {
+    contentItem: Column {
         id: contentColumn
         spacing: Kirigami.Units.largeSpacing
+        width: parent.width
 
         // Status Section
         Kirigami.FormLayout {
             visible: !configMode
+            width: parent.width
 
             QQC2.Label {
                 Kirigami.FormData.label: i18n("Status:")
@@ -69,15 +70,15 @@ QQC2.Dialog {
         QQC2.Label {
             id: resultLabel
             visible: false
-            Layout.fillWidth: true
+            width: parent.width
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
         }
 
         // Sync actions
-        RowLayout {
+        Row {
             visible: !configMode && SyncManager.isConfigured
-            Layout.alignment: Qt.AlignHCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             spacing: Kirigami.Units.largeSpacing
 
             QQC2.Button {
@@ -110,7 +111,7 @@ QQC2.Dialog {
         // Configure button for unconfigured state
         QQC2.Button {
             visible: !configMode && !SyncManager.isConfigured
-            Layout.alignment: Qt.AlignHCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             text: i18n("Configure Sync")
             icon.name: "configure"
             onClicked: configMode = true
@@ -119,7 +120,7 @@ QQC2.Dialog {
         // Configuration Form
         Kirigami.FormLayout {
             visible: configMode
-            Layout.fillWidth: true
+            width: parent.width
 
             QQC2.TextField {
                 id: profileIdField
@@ -170,7 +171,7 @@ QQC2.Dialog {
                 }
             }
 
-            RowLayout {
+            Row {
                 spacing: Kirigami.Units.largeSpacing
 
                 QQC2.Button {
@@ -200,7 +201,7 @@ QQC2.Dialog {
         // Security notice
         QQC2.Label {
             visible: configMode
-            Layout.fillWidth: true
+            width: parent.width
             wrapMode: Text.Wrap
             font.italic: true
             opacity: 0.7
