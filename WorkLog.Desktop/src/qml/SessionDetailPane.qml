@@ -31,7 +31,7 @@ Kirigami.Page {
         onTriggered: root.deleteRequested()
     }
 
-    ColumnLayout {
+    Column {
         anchors.fill: parent
         spacing: Kirigami.Units.smallSpacing
         visible: root.session !== null
@@ -44,25 +44,31 @@ Kirigami.Page {
         }
 
         // Date
-        RowLayout {
+        Row {
+            spacing: Kirigami.Units.smallSpacing
+
             Kirigami.Icon {
                 source: "view-calendar-day"
                 implicitWidth: Kirigami.Units.iconSizes.small
                 implicitHeight: Kirigami.Units.iconSizes.small
+                anchors.verticalCenter: parent.verticalCenter
             }
             QQC2.Label {
                 text: root.session ? Qt.formatDate(root.session.date, "dddd, MMMM d, yyyy") : ""
+                anchors.verticalCenter: parent.verticalCenter
             }
         }
 
         // Tag
-        RowLayout {
+        Row {
             visible: root.session && root.session.tagName && root.session.tagName.length > 0
+            spacing: Kirigami.Units.smallSpacing
 
             Kirigami.Icon {
                 source: "tag"
                 implicitWidth: Kirigami.Units.iconSizes.small
                 implicitHeight: Kirigami.Units.iconSizes.small
+                anchors.verticalCenter: parent.verticalCenter
             }
 
             Rectangle {
@@ -72,6 +78,7 @@ Kirigami.Page {
                 color: "transparent"
                 border.width: 1
                 border.color: Kirigami.Theme.highlightColor
+                anchors.verticalCenter: parent.verticalCenter
 
                 QQC2.Label {
                     id: sessionTagLabel
@@ -84,7 +91,7 @@ Kirigami.Page {
         }
 
         Kirigami.Separator {
-            Layout.fillWidth: true
+            width: parent.width
         }
 
         // Description section
@@ -94,7 +101,7 @@ Kirigami.Page {
         }
 
         QQC2.Label {
-            Layout.fillWidth: true
+            width: parent.width
             text: root.session ? root.session.description : ""
             wrapMode: Text.Wrap
         }
@@ -107,7 +114,7 @@ Kirigami.Page {
         }
 
         QQC2.Label {
-            Layout.fillWidth: true
+            width: parent.width
             visible: root.session && root.session.notes && root.session.notes.length > 0
             text: root.session ? (root.session.notes || "") : ""
             wrapMode: Text.Wrap
@@ -122,19 +129,15 @@ Kirigami.Page {
         }
 
         Kirigami.InlineMessage {
-            Layout.fillWidth: true
+            width: parent.width
             visible: root.session && root.session.nextPlannedStage && root.session.nextPlannedStage.length > 0
             type: Kirigami.MessageType.Information
             text: root.session ? (root.session.nextPlannedStage || "") : ""
         }
-
-        Item {
-            Layout.fillHeight: true
-        }
     }
 
     // Placeholder when no session selected
-    ColumnLayout {
+    Column {
         anchors.centerIn: parent
         visible: root.session === null
         spacing: Kirigami.Units.smallSpacing
@@ -142,13 +145,13 @@ Kirigami.Page {
 
         Kirigami.Icon {
             source: "document-preview"
-            Layout.alignment: Qt.AlignHCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             implicitWidth: Kirigami.Units.iconSizes.large
             implicitHeight: Kirigami.Units.iconSizes.large
         }
 
         QQC2.Label {
-            Layout.alignment: Qt.AlignHCenter
+            anchors.horizontalCenter: parent.horizontalCenter
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 0.9
@@ -156,8 +159,7 @@ Kirigami.Page {
         }
 
         QQC2.Label {
-            Layout.alignment: Qt.AlignHCenter
-            Layout.fillWidth: true
+            width: parent.width
             wrapMode: Text.Wrap
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: Kirigami.Theme.defaultFont.pixelSize * 0.85
