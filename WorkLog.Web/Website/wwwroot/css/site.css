@@ -247,6 +247,7 @@ textarea.form-control {
     max-width: 1400px;
     margin: 0 auto;
     min-height: calc(100vh - 200px);
+    align-items: flex-start;
 }
 
 .hierarchy-panel {
@@ -257,6 +258,9 @@ textarea.form-control {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
     overflow-y: auto;
+    position: sticky;
+    top: 1.5rem;
+    max-height: calc(100vh - 3rem);
 }
 
 .panel-header {
@@ -393,6 +397,16 @@ textarea.form-control {
 .session-actions {
     display: flex;
     gap: 0.5rem;
+}
+
+.session-actions a.btn {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.session-actions a.btn:hover {
+    color: var(--primary-hover);
+    font-weight: bold;
 }
 
 .session-description {
@@ -541,6 +555,8 @@ textarea.form-control {
 
     .hierarchy-panel {
         width: 100%;
+        position: static;
+        max-height: none;
     }
 
     .hierarchy-section.indented,

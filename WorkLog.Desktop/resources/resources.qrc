@@ -7,5 +7,6 @@
         <file alias="qml/SessionDetailPane.qml">../src/qml/SessionDetailPane.qml</file>
         <file alias="qml/SessionEditDialog.qml">../src/qml/SessionEditDialog.qml</file>
         <file alias="qml/TagManagementDialog.qml">../src/qml/TagManagementDialog.qml</file>
+        <file alias="qml/SyncDialog.qml">../src/qml/SyncDialog.qml</file>
     </qresource>
 </RCC>

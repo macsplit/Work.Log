@@ -14,6 +14,10 @@
             <a class="navbar-brand" href="/">Work Log</a>
             @if (User.Identity?.IsAuthenticated == true)
             {
+                <div class="nav-links">
+                    <a asp-controller="Tag" asp-action="Index" class="nav-link">Tags</a>
+                    <a asp-controller="Sync" asp-action="Index" class="nav-link">Sync</a>
+                </div>
                 <div class="nav-user">
                     <span>@User.Identity.Name</span>
                     <form asp-controller="Auth" asp-action="Logout" method="post" class="logout-form">

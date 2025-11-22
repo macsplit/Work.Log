@@ -46,6 +46,19 @@ Kirigami.ApplicationWindow {
                 }
             }
 
+            actions.contextualActions: [
+                Kirigami.Action {
+                    icon.name: "cloud-upload"
+                    text: i18n("Cloud Sync")
+                    onTriggered: syncDialog.open()
+                },
+                Kirigami.Action {
+                    icon.name: "tag"
+                    text: i18n("Manage Tags")
+                    onTriggered: tagDialog.open()
+                }
+            ]
+
             RowLayout {
                 anchors.fill: parent
                 spacing: 1
@@ -189,5 +202,13 @@ Kirigami.ApplicationWindow {
                 }
             }
         }
+    }
+
+    SyncDialog {
+        id: syncDialog
+    }
+
+    TagManagementDialog {
+        id: tagDialog
     }
 }

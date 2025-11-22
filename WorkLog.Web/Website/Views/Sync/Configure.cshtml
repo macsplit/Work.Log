@@ -1,0 +1,149 @@
+@model WorkLog.Domain.Services.Sync.SyncConfiguration
+@{
+    ViewData["Title"] = "Configure Cloud Sync";
+}
+
+<div class="configure-page">
+    <h1>Configure Cloud Sync</h1>
+    <p class="subtitle">Enter your AWS credentials and profile settings</p>
+
+    <div class="configure-card">
+        <form asp-action="Configure" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="form-group">
+                <label for="ProfileId">Profile ID</label>
+                <input type="text" id="ProfileId" name="ProfileId" value="@Model.ProfileId"
+                       placeholder="e.g., my-worklog-profile" required />
+                <p class="help-text">A unique identifier for your data. Use the same ID across all your devices.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="AwsAccessKeyId">AWS Access Key ID</label>
+                <input type="text" id="AwsAccessKeyId" name="AwsAccessKeyId" value="@Model.AwsAccessKeyId"
+                       placeholder="AKIAIOSFODNN7EXAMPLE" required />
+            </div>
+
+            <div class="form-group">
+                <label for="AwsSecretAccessKey">AWS Secret Access Key</label>
+                <input type="password" id="AwsSecretAccessKey" name="AwsSecretAccessKey" value="@Model.AwsSecretAccessKey"
+                       placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" required />
+            </div>
+
+            <div class="form-group">
+                <label for="AwsRegion">AWS Region</label>
+                <select id="AwsRegion" name="AwsRegion">
+                    <option value="us-east-1" selected="@(Model.AwsRegion == "us-east-1")">US East (N. Virginia)</option>
+                    <option value="us-east-2" selected="@(Model.AwsRegion == "us-east-2")">US East (Ohio)</option>
+                    <option value="us-west-1" selected="@(Model.AwsRegion == "us-west-1")">US West (N. California)</option>
+                    <option value="us-west-2" selected="@(Model.AwsRegion == "us-west-2")">US West (Oregon)</option>
+                    <option value="eu-west-1" selected="@(Model.AwsRegion == "eu-west-1")">EU (Ireland)</option>
+                    <option value="eu-west-2" selected="@(Model.AwsRegion == "eu-west-2")">EU (London)</option>
+                    <option value="eu-central-1" selected="@(Model.AwsRegion == "eu-central-1")">EU (Frankfurt)</option>
+                    <option value="ap-northeast-1" selected="@(Model.AwsRegion == "ap-northeast-1")">Asia Pacific (Tokyo)</option>
+                    <option value="ap-southeast-1" selected="@(Model.AwsRegion == "ap-southeast-1")">Asia Pacific (Singapore)</option>
+                    <option value="ap-southeast-2" selected="@(Model.AwsRegion == "ap-southeast-2")">Asia Pacific (Sydney)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="SessionsTableName">Sessions Table Name</label>
+                <input type="text" id="SessionsTableName" name="SessionsTableName" value="@Model.SessionsTableName"
+                       placeholder="WorkLog_Sessions" />
+                <p class="help-text">DynamoDB table name for work sessions (default: WorkLog_Sessions)</p>
+            </div>
+
+            <div class="form-group">
+                <label for="TagsTableName">Tags Table Name</label>
+                <input type="text" id="TagsTableName" name="TagsTableName" value="@Model.TagsTableName"
+                       placeholder="WorkLog_Tags" />
+                <p class="help-text">DynamoDB table name for tags (default: WorkLog_Tags)</p>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Configuration</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="security-notice">
+        <h3>Security Notice</h3>
+        <p>Your AWS credentials are stored locally on this server and are never transmitted elsewhere except to AWS.</p>
+        <p>We recommend creating an IAM user with limited permissions (DynamoDB access only) for this application.</p>
+    </div>
+</div>
+
+<style>
+    .configure-page {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .configure-page h1 {
+        margin-bottom: 0.5rem;
+    }
+    .subtitle {
+        color: var(--text-muted);
+        margin-bottom: 2rem;
+    }
+    .configure-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 1rem;
+        background: var(--input-bg, #fff);
+        color: var(--text-color);
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    .help-text {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.25rem;
+    }
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    .security-notice {
+        background: rgba(245, 158, 11, 0.1);
+        border: 1px solid rgba(245, 158, 11, 0.3);
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+    }
+    .security-notice h3 {
+        margin-top: 0;
+        color: #f59e0b;
+        font-size: 1rem;
+    }
+    .security-notice p {
+        margin: 0.5rem 0;
+        font-size: 0.9rem;
+    }
+    .security-notice p:last-child {
+        margin-bottom: 0;
+    }
+</style>

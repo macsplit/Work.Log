@@ -16,7 +16,7 @@ include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMSetupVersion)
 
 # Use Qt5 with KF5 Kirigami (compatible with Ubuntu 24.04)
-find_package(Qt5 5.15 REQUIRED COMPONENTS Core Quick Sql QuickControls2 Widgets)
+find_package(Qt5 5.15 REQUIRED COMPONENTS Core Quick Sql QuickControls2 Widgets Network)
 find_package(KF5 REQUIRED COMPONENTS Kirigami2 I18n CoreAddons)
 
 # Application sources
@@ -26,6 +26,7 @@ set(worklog_SRCS
     src/cpp/worksessionmodel.cpp
     src/cpp/hierarchymodel.cpp
     src/cpp/tagmodel.cpp
+    src/cpp/syncmanager.cpp
 )
 
 # Qt resources
@@ -39,6 +40,7 @@ target_link_libraries(worklog-desktop
     Qt5::Sql
     Qt5::QuickControls2
     Qt5::Widgets
+    Qt5::Network
     KF5::Kirigami2
     KF5::I18n
     KF5::CoreAddons

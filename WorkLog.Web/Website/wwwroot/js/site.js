@@ -2,8 +2,31 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Work Log application loaded');
+    initHierarchyScrollPersistence();
     renderSessionNotesMarkdown();
 });
+
+// Keep the hierarchy panel scroll position while navigating between dates
+function initHierarchyScrollPersistence() {
+    const panel = document.querySelector('.hierarchy-panel');
+    if (!panel || typeof sessionStorage === 'undefined') {
+        return;
+    }
+
+    const storageKey = 'hierarchy-panel-scroll-top';
+    const savedPosition = sessionStorage.getItem(storageKey);
+    if (savedPosition !== null) {
+        const numericPosition = parseInt(savedPosition, 10);
+        if (!Number.isNaN(numericPosition)) {
+            panel.scrollTop = numericPosition;
+        }
+    }
+
+    const persistScroll = () => sessionStorage.setItem(storageKey, panel.scrollTop.toString());
+    panel.addEventListener('scroll', persistScroll);
+    panel.querySelectorAll('a').forEach((link) => link.addEventListener('click', persistScroll));
+    window.addEventListener('beforeunload', persistScroll);
+}
 
 // Modal functions
 function openModal(title, content) {

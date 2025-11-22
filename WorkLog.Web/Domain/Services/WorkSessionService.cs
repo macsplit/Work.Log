@@ -23,6 +23,14 @@ public class WorkSessionService : IWorkSessionService
         // Round to nearest 0.5 hours
         timeHours = Math.Round(timeHours * 2) / 2;
 
+        // Get tag's CloudId if tag is specified
+        string? tagCloudId = null;
+        if (tagId.HasValue)
+        {
+            var tag = await _context.Tags.FindAsync(tagId.Value);
+            tagCloudId = tag?.CloudId;
+        }
+
         var session = new WorkSession
         {
             UserId = userId,
@@ -32,6 +40,7 @@ public class WorkSessionService : IWorkSessionService
             Notes = notes,
             NextPlannedStage = nextPlannedStage,
             TagId = tagId,
+            TagCloudId = tagCloudId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -46,14 +55,15 @@ public class WorkSessionService : IWorkSessionService
     {
         return await _context.WorkSessions
             .Include(s => s.Tag)
-            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId && !s.IsDeleted);
     }
 
     public async Task<WorkSession?> UpdateSession(int id, int userId, DateOnly date,
         double timeHours, string description, string? notes = null, string? nextPlannedStage = null, int? tagId = null)
     {
         var session = await _context.WorkSessions
-            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId);
+            .Include(s => s.Tag)
+            .FirstOrDefaultAsync(s => s.Id == id && s.UserId == userId && !s.IsDeleted);
 
         if (session == null)
         {
@@ -71,6 +81,17 @@ public class WorkSessionService : IWorkSessionService
         session.TagId = tagId;
         session.UpdatedAt = DateTime.UtcNow;
 
+        // Update TagCloudId for sync
+        if (tagId.HasValue)
+        {
+            var tag = await _context.Tags.FindAsync(tagId.Value);
+            session.TagCloudId = tag?.CloudId;
+        }
+        else
+        {
+            session.TagCloudId = null;
+        }
+
         await _context.SaveChangesAsync();
 
         return session;
@@ -86,7 +107,9 @@ public class WorkSessionService : IWorkSessionService
             return false;
         }
 
-        _context.WorkSessions.Remove(session);
+        // Soft delete for sync support
+        session.IsDeleted = true;
+        session.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
         return true;
@@ -96,7 +119,7 @@ public class WorkSessionService : IWorkSessionService
     {
         return await _context.WorkSessions
             .Include(s => s.Tag)
-            .Where(s => s.UserId == userId && s.SessionDate == date)
+            .Where(s => s.UserId == userId && s.SessionDate == date && !s.IsDeleted)
             .OrderBy(s => s.CreatedAt)
             .ToListAsync();
     }
@@ -104,7 +127,7 @@ public class WorkSessionService : IWorkSessionService
     public async Task<IEnumerable<int>> GetYears(int userId)
     {
         return await _context.WorkSessions
-            .Where(s => s.UserId == userId)
+            .Where(s => s.UserId == userId && !s.IsDeleted)
             .Select(s => s.SessionDate.Year)
             .Distinct()
             .OrderByDescending(y => y)
@@ -114,7 +137,7 @@ public class WorkSessionService : IWorkSessionService
     public async Task<IEnumerable<int>> GetMonthsForYear(int userId, int year)
     {
         return await _context.WorkSessions
-            .Where(s => s.UserId == userId && s.SessionDate.Year == year)
+            .Where(s => s.UserId == userId && s.SessionDate.Year == year && !s.IsDeleted)
             .Select(s => s.SessionDate.Month)
             .Distinct()
             .OrderBy(m => m)
@@ -126,7 +149,8 @@ public class WorkSessionService : IWorkSessionService
         var sessions = await _context.WorkSessions
             .Where(s => s.UserId == userId &&
                         s.SessionDate.Year == year &&
-                        s.SessionDate.Month == month)
+                        s.SessionDate.Month == month &&
+                        !s.IsDeleted)
             .ToListAsync();
 
         return sessions
@@ -139,7 +163,7 @@ public class WorkSessionService : IWorkSessionService
     public async Task<IEnumerable<DateOnly>> GetDaysForWeek(int userId, int year, int week)
     {
         var sessions = await _context.WorkSessions
-            .Where(s => s.UserId == userId && s.SessionDate.Year == year)
+            .Where(s => s.UserId == userId && s.SessionDate.Year == year && !s.IsDeleted)
             .ToListAsync();
 
         return sessions
@@ -155,7 +179,8 @@ public class WorkSessionService : IWorkSessionService
         return await _context.WorkSessions
             .Where(s => s.UserId == userId &&
                         s.SessionDate.Year == year &&
-                        s.SessionDate.Month == month)
+                        s.SessionDate.Month == month &&
+                        !s.IsDeleted)
             .Select(s => s.SessionDate)
             .Distinct()
             .OrderBy(d => d)
@@ -165,14 +190,14 @@ public class WorkSessionService : IWorkSessionService
     public async Task<double> GetTotalHoursForDate(int userId, DateOnly date)
     {
         return await _context.WorkSessions
-            .Where(s => s.UserId == userId && s.SessionDate == date)
+            .Where(s => s.UserId == userId && s.SessionDate == date && !s.IsDeleted)
             .SumAsync(s => s.TimeHours);
     }
 
     public async Task<double> GetTotalHoursForWeek(int userId, int year, int week)
     {
         var sessions = await _context.WorkSessions
-            .Where(s => s.UserId == userId && s.SessionDate.Year == year)
+            .Where(s => s.UserId == userId && s.SessionDate.Year == year && !s.IsDeleted)
             .ToListAsync();
 
         return sessions
@@ -183,7 +208,7 @@ public class WorkSessionService : IWorkSessionService
     public async Task<double> GetAverageHoursPerWeekForYear(int userId, int year)
     {
         var sessions = await _context.WorkSessions
-            .Where(s => s.UserId == userId && s.SessionDate.Year == year)
+            .Where(s => s.UserId == userId && s.SessionDate.Year == year && !s.IsDeleted)
             .ToListAsync();
 
         var weekGroups = sessions
@@ -202,7 +227,8 @@ public class WorkSessionService : IWorkSessionService
         var sessions = await _context.WorkSessions
             .Where(s => s.UserId == userId &&
                         s.SessionDate.Year == year &&
-                        s.SessionDate.Month == month)
+                        s.SessionDate.Month == month &&
+                        !s.IsDeleted)
             .ToListAsync();
 
         var weekGroups = sessions

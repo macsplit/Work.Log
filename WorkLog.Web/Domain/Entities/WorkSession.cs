@@ -49,4 +49,19 @@ public class WorkSession
     public int? TagId { get; set; }
 
     public Tag? Tag { get; set; }
+
+    /// <summary>
+    /// UUID for cloud sync (null if never synced).
+    /// </summary>
+    public string? CloudId { get; set; }
+
+    /// <summary>
+    /// Soft delete flag for sync.
+    /// </summary>
+    public bool IsDeleted { get; set; } = false;
+
+    /// <summary>
+    /// Cloud ID of associated tag (for sync reference).
+    /// </summary>
+    public string? TagCloudId { get; set; }
 }

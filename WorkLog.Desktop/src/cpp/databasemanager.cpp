@@ -44,11 +44,14 @@ bool DatabaseManager::createTables()
 {
     QSqlQuery query(m_database);
 
-    // Create Tags table
+    // Create Tags table with sync support
     QString createTagsTable = QStringLiteral(R"(
         CREATE TABLE IF NOT EXISTS Tags (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
-            Name TEXT NOT NULL UNIQUE
+            Name TEXT NOT NULL UNIQUE,
+            CloudId TEXT,
+            UpdatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+            IsDeleted INTEGER NOT NULL DEFAULT 0
         )
     )");
 
@@ -58,7 +61,7 @@ bool DatabaseManager::createTables()
         return false;
     }
 
-    // Create WorkSessions table
+    // Create WorkSessions table with sync support
     QString createTable = QStringLiteral(R"(
         CREATE TABLE IF NOT EXISTS WorkSessions (
             Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -70,6 +73,9 @@ bool DatabaseManager::createTables()
             TagId INTEGER,
             CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
             UpdatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+            CloudId TEXT,
+            IsDeleted INTEGER NOT NULL DEFAULT 0,
+            TagCloudId TEXT,
             FOREIGN KEY (TagId) REFERENCES Tags(Id) ON DELETE SET NULL
         )
     )");
@@ -80,17 +86,31 @@ bool DatabaseManager::createTables()
         return false;
     }
 
-    // Add TagId column if it doesn't exist (for existing databases)
-    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN TagId INTEGER REFERENCES Tags(Id) ON DELETE SET NULL"));
+    // Create SyncMetadata table
+    QString createSyncMetadataTable = QStringLiteral(R"(
+        CREATE TABLE IF NOT EXISTS SyncMetadata (
+            Key TEXT PRIMARY KEY,
+            Value TEXT NOT NULL
+        )
+    )");
 
-    // Create index for date queries
-    QString createIndex = QStringLiteral(
-        "CREATE INDEX IF NOT EXISTS idx_worksessions_date ON WorkSessions(SessionDate)"
-    );
-
-    if (!query.exec(createIndex)) {
-        qWarning() << "Failed to create index:" << query.lastError().text();
+    if (!query.exec(createSyncMetadataTable)) {
+        qWarning() << "Failed to create SyncMetadata table:" << query.lastError().text();
     }
+
+    // Migration: Add new columns for existing databases
+    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN TagId INTEGER REFERENCES Tags(Id) ON DELETE SET NULL"));
+    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN CloudId TEXT"));
+    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0"));
+    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN TagCloudId TEXT"));
+    query.exec(QStringLiteral("ALTER TABLE Tags ADD COLUMN CloudId TEXT"));
+    query.exec(QStringLiteral("ALTER TABLE Tags ADD COLUMN UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))"));
+    query.exec(QStringLiteral("ALTER TABLE Tags ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0"));
+
+    // Create indexes
+    query.exec(QStringLiteral("CREATE INDEX IF NOT EXISTS idx_worksessions_date ON WorkSessions(SessionDate)"));
+    query.exec(QStringLiteral("CREATE INDEX IF NOT EXISTS idx_worksessions_cloudid ON WorkSessions(CloudId)"));
+    query.exec(QStringLiteral("CREATE INDEX IF NOT EXISTS idx_tags_cloudid ON Tags(CloudId)"));
 
     return true;
 }

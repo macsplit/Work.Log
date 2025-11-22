@@ -24,19 +24,28 @@ public class TagService : ITagService
             return null;
         }
 
-        // Check if tag with same name already exists for user
-        var exists = await _context.Tags
-            .AnyAsync(t => t.UserId == userId && t.Name == trimmedName);
+        // Check if tag with same name already exists for user (including soft-deleted)
+        var existingTag = await _context.Tags
+            .FirstOrDefaultAsync(t => t.UserId == userId && t.Name == trimmedName);
 
-        if (exists)
+        if (existingTag != null)
         {
+            // If it was soft-deleted, restore it
+            if (existingTag.IsDeleted)
+            {
+                existingTag.IsDeleted = false;
+                existingTag.UpdatedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                return existingTag;
+            }
             return null;
         }
 
         var tag = new Tag
         {
             Name = trimmedName,
-            UserId = userId
+            UserId = userId,
+            UpdatedAt = DateTime.UtcNow
         };
 
         _context.Tags.Add(tag);
@@ -48,7 +57,7 @@ public class TagService : ITagService
     public async Task<IEnumerable<Tag>> GetAllTags(int userId)
     {
         return await _context.Tags
-            .Where(t => t.UserId == userId)
+            .Where(t => t.UserId == userId && !t.IsDeleted)
             .OrderBy(t => t.Name)
             .ToListAsync();
     }
@@ -56,7 +65,7 @@ public class TagService : ITagService
     public async Task<Tag?> GetTag(int id, int userId)
     {
         return await _context.Tags
-            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId);
+            .FirstOrDefaultAsync(t => t.Id == id && t.UserId == userId && !t.IsDeleted);
     }
 
     public async Task<bool> DeleteTag(int id, int userId)
@@ -69,7 +78,9 @@ public class TagService : ITagService
             return false;
         }
 
-        _context.Tags.Remove(tag);
+        // Soft delete for sync support
+        tag.IsDeleted = true;
+        tag.UpdatedAt = DateTime.UtcNow;
         await _context.SaveChangesAsync();
 
         return true;

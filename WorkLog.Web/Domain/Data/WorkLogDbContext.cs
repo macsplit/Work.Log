@@ -17,6 +17,7 @@ public class WorkLogDbContext : DbContext
     public DbSet<WorkSession> WorkSessions => Set<WorkSession>();
     public DbSet<Tag> Tags => Set<Tag>();
     public DbSet<SystemSetting> SystemSettings => Set<SystemSetting>();
+    public DbSet<SyncMetadata> SyncMetadata => Set<SyncMetadata>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,6 +38,7 @@ public class WorkLogDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.SessionDate);
             entity.HasIndex(e => new { e.UserId, e.SessionDate });
+            entity.HasIndex(e => e.CloudId);
             entity.Property(e => e.Description).IsRequired();
 
             entity.HasOne(e => e.User)
@@ -56,6 +58,7 @@ public class WorkLogDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.HasIndex(e => new { e.Name, e.UserId }).IsUnique();
+            entity.HasIndex(e => e.CloudId);
 
             entity.HasOne(e => e.User)
                   .WithMany(u => u.Tags)
@@ -65,6 +68,13 @@ public class WorkLogDbContext : DbContext
 
         // SystemSetting configuration
         modelBuilder.Entity<SystemSetting>(entity =>
+        {
+            entity.HasKey(e => e.Key);
+            entity.Property(e => e.Value).IsRequired();
+        });
+
+        // SyncMetadata configuration
+        modelBuilder.Entity<SyncMetadata>(entity =>
         {
             entity.HasKey(e => e.Key);
             entity.Property(e => e.Value).IsRequired();

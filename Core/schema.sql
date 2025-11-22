@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS Tags (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,
     Name TEXT NOT NULL,
     UserId INTEGER,                      -- NULL for desktop app, user ID for web app
+    CloudId TEXT,                        -- UUID for cloud sync (NULL if never synced)
+    UpdatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+    IsDeleted INTEGER NOT NULL DEFAULT 0, -- Soft delete for sync
     UNIQUE(Name, UserId),                -- Tag names unique per user
     FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
 );
@@ -38,13 +41,24 @@ CREATE TABLE IF NOT EXISTS WorkSessions (
     CreatedAt TEXT NOT NULL DEFAULT (datetime('now')),
     UpdatedAt TEXT NOT NULL DEFAULT (datetime('now')),
     UserId INTEGER,                      -- NULL for desktop app, user ID for web app
+    CloudId TEXT,                        -- UUID for cloud sync (NULL if never synced)
+    IsDeleted INTEGER NOT NULL DEFAULT 0, -- Soft delete for sync
+    TagCloudId TEXT,                     -- Cloud ID of associated tag (for sync)
     FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
     FOREIGN KEY (TagId) REFERENCES Tags(Id) ON DELETE SET NULL
+);
+
+-- Sync metadata - tracks cloud sync state
+CREATE TABLE IF NOT EXISTS SyncMetadata (
+    Key TEXT PRIMARY KEY,
+    Value TEXT NOT NULL
 );
 
 -- Index for efficient date-based queries (hierarchy navigation)
 CREATE INDEX IF NOT EXISTS idx_worksessions_date ON WorkSessions(SessionDate);
 CREATE INDEX IF NOT EXISTS idx_worksessions_user_date ON WorkSessions(UserId, SessionDate);
+CREATE INDEX IF NOT EXISTS idx_worksessions_cloudid ON WorkSessions(CloudId);
+CREATE INDEX IF NOT EXISTS idx_tags_cloudid ON Tags(CloudId);
 
 -- View for year extraction
 CREATE VIEW IF NOT EXISTS SessionYears AS

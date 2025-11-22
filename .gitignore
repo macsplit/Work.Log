@@ -132,3 +132,10 @@ Desktop.ini
 *.tmp
 *.temp
 logs/
+
+# =============================================================================
+# Cloud Sync Configuration (contains AWS credentials)
+# =============================================================================
+worklog-sync.json
+worklog-sync.config
+appsettings.Sync.json
