@@ -302,53 +302,56 @@ textarea.form-control {
     font-weight: 600;
 }
 
-.hierarchy-section {
-    margin-bottom: 1rem;
-}
-
-.hierarchy-section h3 {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-}
-
-.hierarchy-section.indented {
-    padding-left: 0.75rem;
-}
-
-.hierarchy-section.indented-2 {
-    padding-left: 1.5rem;
-}
-
-.hierarchy-section.indented-3 {
-    padding-left: 2.25rem;
-}
-
+/* Tree hierarchy styles */
 .hierarchy-list {
     list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-.hierarchy-list li {
-    margin-bottom: 0.25rem;
+.tree-root {
+    padding: 0;
 }
 
-.hierarchy-list li a {
-    display: block;
+.tree-children {
+    padding-left: 1rem;
+    margin-top: 0.125rem;
+}
+
+.tree-node {
+    margin-bottom: 0.125rem;
+}
+
+.tree-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     padding: 0.375rem 0.5rem;
     color: var(--text-color);
     text-decoration: none;
     border-radius: 0.25rem;
     font-size: 0.875rem;
+    transition: background-color 0.1s ease;
 }
 
-.hierarchy-list li a:hover {
+.tree-item:hover {
     background-color: var(--bg-color);
 }
 
-.hierarchy-list li.selected a {
+.tree-item.selected {
     background-color: var(--primary-color);
     color: white;
+}
+
+.tree-icon {
+    font-size: 0.625rem;
+    width: 1rem;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.tree-leaf .tree-icon {
+    font-size: 0.875rem;
 }
 
 .empty-message {

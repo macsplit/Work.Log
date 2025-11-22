@@ -13,93 +13,89 @@
                class="btn btn-primary btn-sm">+ New Session</a>
         </div>
 
-        <!-- Years -->
-        <div class="hierarchy-section">
-            <h3>Years</h3>
-            @if (Model.Years.Any())
-            {
-                <ul class="hierarchy-list">
-                    @foreach (var year in Model.Years)
-                    {
-                        var avgPerWeek = Model.YearAverageHoursPerWeek.TryGetValue(year, out var yAvg) ? yAvg : 0.0;
-                        <li class="@(Model.SelectedYear == year ? "selected" : "")">
-                            <a asp-action="Index" asp-route-year="@year">
-                                @year (@avgPerWeek.ToString("0.0")h/wk)
-                            </a>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p class="empty-message">No sessions recorded yet</p>
-            }
-        </div>
-
-        <!-- Months -->
-        @if (Model.SelectedYear.HasValue && Model.Months.Any())
+        <!-- Tree hierarchy: Years -> Months -> Weeks -> Days -->
+        @if (Model.Years.Any())
         {
-            <div class="hierarchy-section indented">
-                <h3>Months</h3>
-                <ul class="hierarchy-list">
-                    @foreach (var month in Model.Months)
-                    {
-                        var avgPerWeek = Model.MonthAverageHoursPerWeek.TryGetValue(month, out var mAvg) ? mAvg : 0.0;
-                        <li class="@(Model.SelectedMonth == month ? "selected" : "")">
-                            <a asp-action="Index"
-                               asp-route-year="@Model.SelectedYear"
-                               asp-route-month="@month">
-                                @Model.GetMonthName(month) (@avgPerWeek.ToString("0.0")h/wk)
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
+            <ul class="hierarchy-list tree-root">
+                @foreach (var year in Model.Years)
+                {
+                    var yearSelected = Model.SelectedYear == year;
+                    var avgPerWeek = Model.YearAverageHoursPerWeek.TryGetValue(year, out var yAvg) ? yAvg : 0.0;
+                    <li class="tree-node @(yearSelected ? "expanded" : "")">
+                        <a asp-action="Index" asp-route-year="@(yearSelected ? null : year)" class="tree-item @(yearSelected ? "selected" : "")">
+                            <span class="tree-icon">@(yearSelected ? "▼" : "▶")</span>
+                            @year (@avgPerWeek.ToString("0.0")h/wk)
+                        </a>
+
+                        @if (yearSelected && Model.Months.Any())
+                        {
+                            <ul class="hierarchy-list tree-children">
+                                @foreach (var month in Model.Months)
+                                {
+                                    var monthSelected = Model.SelectedMonth == month;
+                                    var mAvg = Model.MonthAverageHoursPerWeek.TryGetValue(month, out var mAvgVal) ? mAvgVal : 0.0;
+                                    <li class="tree-node @(monthSelected ? "expanded" : "")">
+                                        <a asp-action="Index"
+                                           asp-route-year="@Model.SelectedYear"
+                                           asp-route-month="@(monthSelected ? null : month)"
+                                           class="tree-item @(monthSelected ? "selected" : "")">
+                                            <span class="tree-icon">@(monthSelected ? "▼" : "▶")</span>
+                                            @Model.GetMonthName(month) (@mAvg.ToString("0.0")h/wk)
+                                        </a>
+
+                                        @if (monthSelected && Model.Weeks.Any())
+                                        {
+                                            <ul class="hierarchy-list tree-children">
+                                                @foreach (var week in Model.Weeks)
+                                                {
+                                                    var weekSelected = Model.SelectedWeek == week;
+                                                    var wTotal = Model.WeekTotalHours.TryGetValue(week, out var wTotalVal) ? wTotalVal : 0.0;
+                                                    <li class="tree-node @(weekSelected ? "expanded" : "")">
+                                                        <a asp-action="Index"
+                                                           asp-route-year="@Model.SelectedYear"
+                                                           asp-route-month="@Model.SelectedMonth"
+                                                           asp-route-week="@(weekSelected ? null : week)"
+                                                           class="tree-item @(weekSelected ? "selected" : "")">
+                                                            <span class="tree-icon">@(weekSelected ? "▼" : "▶")</span>
+                                                            @Model.GetWeekLabel(week) (@wTotal.ToString("0.0")h)
+                                                        </a>
+
+                                                        @if (weekSelected && Model.Days.Any())
+                                                        {
+                                                            <ul class="hierarchy-list tree-children">
+                                                                @foreach (var day in Model.Days)
+                                                                {
+                                                                    var daySelected = Model.SelectedDate == day;
+                                                                    var dTotal = Model.DayTotalHours.TryGetValue(day, out var dTotalVal) ? dTotalVal : 0.0;
+                                                                    <li class="tree-node">
+                                                                        <a asp-action="Index"
+                                                                           asp-route-year="@Model.SelectedYear"
+                                                                           asp-route-month="@Model.SelectedMonth"
+                                                                           asp-route-week="@Model.SelectedWeek"
+                                                                           asp-route-date="@day.ToString("yyyy-MM-dd")"
+                                                                           class="tree-item tree-leaf @(daySelected ? "selected" : "")">
+                                                                            <span class="tree-icon">📅</span>
+                                                                            @Model.GetDayLabel(day) (@dTotal.ToString("0.0")h)
+                                                                        </a>
+                                                                    </li>
+                                                                }
+                                                            </ul>
+                                                        }
+                                                    </li>
+                                                }
+                                            </ul>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </li>
+                }
+            </ul>
         }
-
-        <!-- Weeks -->
-        @if (Model.SelectedMonth.HasValue && Model.Weeks.Any())
+        else
         {
-            <div class="hierarchy-section indented-2">
-                <h3>Weeks</h3>
-                <ul class="hierarchy-list">
-                    @foreach (var week in Model.Weeks)
-                    {
-                        var total = Model.WeekTotalHours.TryGetValue(week, out var wTotal) ? wTotal : 0.0;
-                        <li class="@(Model.SelectedWeek == week ? "selected" : "")">
-                            <a asp-action="Index"
-                               asp-route-year="@Model.SelectedYear"
-                               asp-route-month="@Model.SelectedMonth"
-                               asp-route-week="@week">
-                                @Model.GetWeekLabel(week) (@total.ToString("0.0")h)
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
-        }
-
-        <!-- Days -->
-        @if (Model.SelectedMonth.HasValue && Model.Days.Any())
-        {
-            <div class="hierarchy-section indented-3">
-                <h3>Days</h3>
-                <ul class="hierarchy-list">
-                    @foreach (var day in Model.Days)
-                    {
-                        var total = Model.DayTotalHours.TryGetValue(day, out var dTotal) ? dTotal : 0.0;
-                        <li class="@(Model.SelectedDate == day ? "selected" : "")">
-                            <a asp-action="Index"
-                               asp-route-year="@Model.SelectedYear"
-                               asp-route-month="@Model.SelectedMonth"
-                               asp-route-week="@Model.SelectedWeek"
-                               asp-route-date="@day.ToString("yyyy-MM-dd")">
-                                @Model.GetDayLabel(day) (@total.ToString("0.0")h)
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
+            <p class="empty-message">No sessions recorded yet</p>
         }
     </aside>
 

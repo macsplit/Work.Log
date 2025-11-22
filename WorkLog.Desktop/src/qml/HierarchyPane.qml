@@ -14,33 +14,13 @@ Kirigami.ScrollablePage {
     rightPadding: Kirigami.Units.smallSpacing
 
     ColumnLayout {
-        spacing: Kirigami.Units.smallSpacing
+        spacing: 0
 
-        // Years section
+        // Header
         Kirigami.Heading {
             level: 4
             text: i18n("Years")
-        }
-
-        Repeater {
-            model: HierarchyModel.years
-
-            QQC2.ItemDelegate {
-                Layout.fillWidth: true
-                // Use string conversion to avoid locale digit grouping (e.g., 2,024)
-                text: i18n("%1 (%2h/wk)",
-                           String(modelData),
-                           HierarchyModel.yearAverageHoursPerWeek(modelData).toFixed(1))
-                highlighted: HierarchyModel.selectedYear === modelData
-                icon.name: HierarchyModel.selectedYear === modelData ? "go-down" : "go-next"
-                onClicked: {
-                    if (HierarchyModel.selectedYear === modelData) {
-                        HierarchyModel.selectedYear = 0
-                    } else {
-                        HierarchyModel.selectedYear = modelData
-                    }
-                }
-            }
+            Layout.bottomMargin: Kirigami.Units.smallSpacing
         }
 
         // Placeholder when no data
@@ -52,106 +32,129 @@ Kirigami.ScrollablePage {
             wrapMode: Text.Wrap
         }
 
-        // Months section
-        ColumnLayout {
-            visible: HierarchyModel.selectedYear > 0
-            spacing: Kirigami.Units.smallSpacing
-            Layout.leftMargin: Kirigami.Units.smallSpacing
+        // Tree structure: Years -> Months -> Weeks -> Days
+        Repeater {
+            model: HierarchyModel.years
 
-            Kirigami.Heading {
-                level: 5
-                text: i18n("Months")
-            }
+            ColumnLayout {
+                spacing: 0
+                Layout.fillWidth: true
 
-            Repeater {
-                // Explicit dependency on selectedYear to trigger re-evaluation
-                model: {
-                    var year = HierarchyModel.selectedYear;
-                    return year > 0 ? HierarchyModel.getMonths() : [];
-                }
+                property int yearValue: modelData
+                property bool isExpanded: HierarchyModel.selectedYear === yearValue
 
+                // Year item
                 QQC2.ItemDelegate {
                     Layout.fillWidth: true
                     text: i18n("%1 (%2h/wk)",
-                               HierarchyModel.monthName(modelData),
-                               HierarchyModel.monthAverageHoursPerWeek(modelData).toFixed(1))
-                    highlighted: HierarchyModel.selectedMonth === modelData
-                    icon.name: HierarchyModel.selectedMonth === modelData ? "go-down" : "go-next"
+                               String(yearValue),
+                               HierarchyModel.yearAverageHoursPerWeek(yearValue).toFixed(1))
+                    highlighted: isExpanded
+                    icon.name: isExpanded ? "go-down" : "go-next"
                     onClicked: {
-                        if (HierarchyModel.selectedMonth === modelData) {
-                            HierarchyModel.selectedMonth = 0
+                        if (HierarchyModel.selectedYear === yearValue) {
+                            HierarchyModel.selectedYear = 0
                         } else {
-                            HierarchyModel.selectedMonth = modelData
+                            HierarchyModel.selectedYear = yearValue
                         }
                     }
                 }
-            }
-        }
 
-        // Weeks section
-        ColumnLayout {
-            visible: HierarchyModel.selectedMonth > 0
-            spacing: Kirigami.Units.smallSpacing
-            Layout.leftMargin: Kirigami.Units.smallSpacing * 2
-
-            Kirigami.Heading {
-                level: 5
-                text: i18n("Weeks")
-            }
-
-            Repeater {
-                // Explicit dependency on selectedMonth to trigger re-evaluation
-                model: {
-                    var month = HierarchyModel.selectedMonth;
-                    return month > 0 ? HierarchyModel.getWeeks() : [];
-                }
-
-                QQC2.ItemDelegate {
+                // Months for this year (nested under year)
+                ColumnLayout {
+                    visible: isExpanded
+                    spacing: 0
                     Layout.fillWidth: true
-                    text: i18n("%1 (%2h)",
-                               HierarchyModel.weekLabel(modelData),
-                               HierarchyModel.weekTotalHours(modelData).toFixed(1))
-                    highlighted: HierarchyModel.selectedWeek === modelData
-                    icon.name: HierarchyModel.selectedWeek === modelData ? "go-down" : "go-next"
-                    onClicked: {
-                        if (HierarchyModel.selectedWeek === modelData) {
-                            HierarchyModel.selectedWeek = 0
-                        } else {
-                            HierarchyModel.selectedWeek = modelData
+                    Layout.leftMargin: Kirigami.Units.gridUnit
+
+                    Repeater {
+                        model: isExpanded ? HierarchyModel.getMonths() : []
+
+                        ColumnLayout {
+                            spacing: 0
+                            Layout.fillWidth: true
+
+                            property int monthValue: modelData
+                            property bool monthExpanded: HierarchyModel.selectedMonth === monthValue
+
+                            // Month item
+                            QQC2.ItemDelegate {
+                                Layout.fillWidth: true
+                                text: i18n("%1 (%2h/wk)",
+                                           HierarchyModel.monthName(monthValue),
+                                           HierarchyModel.monthAverageHoursPerWeek(monthValue).toFixed(1))
+                                highlighted: monthExpanded
+                                icon.name: monthExpanded ? "go-down" : "go-next"
+                                onClicked: {
+                                    if (HierarchyModel.selectedMonth === monthValue) {
+                                        HierarchyModel.selectedMonth = 0
+                                    } else {
+                                        HierarchyModel.selectedMonth = monthValue
+                                    }
+                                }
+                            }
+
+                            // Weeks for this month (nested under month)
+                            ColumnLayout {
+                                visible: monthExpanded
+                                spacing: 0
+                                Layout.fillWidth: true
+                                Layout.leftMargin: Kirigami.Units.gridUnit
+
+                                Repeater {
+                                    model: monthExpanded ? HierarchyModel.getWeeks() : []
+
+                                    ColumnLayout {
+                                        spacing: 0
+                                        Layout.fillWidth: true
+
+                                        property int weekValue: modelData
+                                        property bool weekExpanded: HierarchyModel.selectedWeek === weekValue
+
+                                        // Week item
+                                        QQC2.ItemDelegate {
+                                            Layout.fillWidth: true
+                                            text: i18n("%1 (%2h)",
+                                                       HierarchyModel.weekLabel(weekValue),
+                                                       HierarchyModel.weekTotalHours(weekValue).toFixed(1))
+                                            highlighted: weekExpanded
+                                            icon.name: weekExpanded ? "go-down" : "go-next"
+                                            onClicked: {
+                                                if (HierarchyModel.selectedWeek === weekValue) {
+                                                    HierarchyModel.selectedWeek = 0
+                                                } else {
+                                                    HierarchyModel.selectedWeek = weekValue
+                                                }
+                                            }
+                                        }
+
+                                        // Days for this week (nested under week)
+                                        ColumnLayout {
+                                            visible: weekExpanded
+                                            spacing: 0
+                                            Layout.fillWidth: true
+                                            Layout.leftMargin: Kirigami.Units.gridUnit
+
+                                            Repeater {
+                                                model: weekExpanded ? HierarchyModel.getDays() : []
+
+                                                QQC2.ItemDelegate {
+                                                    Layout.fillWidth: true
+                                                    property date itemDate: modelData
+                                                    text: i18n("%1 (%2h)",
+                                                               Qt.formatDate(itemDate, "ddd, MMM d"),
+                                                               HierarchyModel.dayTotalHours(itemDate).toFixed(1))
+                                                    icon.name: "view-calendar-day"
+                                                    onClicked: {
+                                                        root.dateSelected(itemDate)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                    }
-                }
-            }
-        }
-
-        // Days section
-        ColumnLayout {
-            visible: HierarchyModel.selectedMonth > 0
-            spacing: Kirigami.Units.smallSpacing
-            Layout.leftMargin: Kirigami.Units.smallSpacing * 3
-
-            Kirigami.Heading {
-                level: 5
-                text: i18n("Days")
-            }
-
-            Repeater {
-                // Explicit dependency on selectedMonth/selectedWeek to trigger re-evaluation
-                model: {
-                    var month = HierarchyModel.selectedMonth;
-                    var week = HierarchyModel.selectedWeek;
-                    return month > 0 ? HierarchyModel.getDays() : [];
-                }
-
-                QQC2.ItemDelegate {
-                    Layout.fillWidth: true
-                    property date itemDate: modelData
-                    text: i18n("%1 (%2h)",
-                               Qt.formatDate(itemDate, "ddd, MMM d"),
-                               HierarchyModel.dayTotalHours(itemDate).toFixed(1))
-                    icon.name: "view-calendar-day"
-                    onClicked: {
-                        root.dateSelected(itemDate)
                     }
                 }
             }
