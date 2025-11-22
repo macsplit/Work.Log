@@ -75,7 +75,10 @@ void SyncManager::saveConfiguration(const QString &accessKeyId,
                                     const QString &profileId)
 {
     m_config.awsAccessKeyId = accessKeyId;
-    m_config.awsSecretAccessKey = secretAccessKey;
+    // Only update secret key if a new one is provided
+    if (!secretAccessKey.isEmpty()) {
+        m_config.awsSecretAccessKey = secretAccessKey;
+    }
     m_config.awsRegion = region.isEmpty() ? QStringLiteral("us-east-1") : region;
     m_config.profileId = profileId;
 
@@ -123,6 +126,16 @@ QString SyncManager::getProfileId() const
 QString SyncManager::getAwsRegion() const
 {
     return m_config.awsRegion;
+}
+
+QString SyncManager::getAwsAccessKeyId() const
+{
+    return m_config.awsAccessKeyId;
+}
+
+bool SyncManager::hasSecretKey() const
+{
+    return !m_config.awsSecretAccessKey.isEmpty();
 }
 
 void SyncManager::sync()

@@ -60,6 +60,8 @@ public:
 
     Q_INVOKABLE QString getProfileId() const;
     Q_INVOKABLE QString getAwsRegion() const;
+    Q_INVOKABLE QString getAwsAccessKeyId() const;
+    Q_INVOKABLE bool hasSecretKey() const;
 
 signals:
     void configurationChanged();

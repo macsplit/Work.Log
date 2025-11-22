@@ -132,13 +132,14 @@ QQC2.Dialog {
                 id: accessKeyField
                 Kirigami.FormData.label: i18n("AWS Access Key ID:")
                 placeholderText: i18n("AKIAIOSFODNN7EXAMPLE")
+                text: SyncManager.getAwsAccessKeyId()
             }
 
             QQC2.TextField {
                 id: secretKeyField
                 Kirigami.FormData.label: i18n("AWS Secret Access Key:")
                 echoMode: TextInput.Password
-                placeholderText: i18n("Your secret key")
+                placeholderText: SyncManager.hasSecretKey() ? i18n("(unchanged)") : i18n("Your secret key")
             }
 
             QQC2.ComboBox {
