@@ -37,11 +37,77 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-// Ensure database is created
+// Ensure database is created and migrated
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<WorkLogDbContext>();
     dbContext.Database.EnsureCreated();
+
+    // Apply manual migrations for sync columns
+    ApplyMigrations(dbContext);
+}
+
+void ApplyMigrations(WorkLogDbContext dbContext)
+{
+    var connection = dbContext.Database.GetDbConnection();
+    connection.Open();
+
+    try
+    {
+        // Check and add missing columns to Tags table
+        var columns = GetTableColumns(connection, "Tags");
+
+        if (!columns.Contains("CloudId"))
+            ExecuteSql(connection, "ALTER TABLE Tags ADD COLUMN CloudId TEXT");
+
+        if (!columns.Contains("UpdatedAt"))
+            ExecuteSql(connection, "ALTER TABLE Tags ADD COLUMN UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))");
+
+        if (!columns.Contains("IsDeleted"))
+            ExecuteSql(connection, "ALTER TABLE Tags ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0");
+
+        // Check and add missing columns to WorkSessions table
+        columns = GetTableColumns(connection, "WorkSessions");
+
+        if (!columns.Contains("CloudId"))
+            ExecuteSql(connection, "ALTER TABLE WorkSessions ADD COLUMN CloudId TEXT");
+
+        if (!columns.Contains("IsDeleted"))
+            ExecuteSql(connection, "ALTER TABLE WorkSessions ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0");
+
+        if (!columns.Contains("TagCloudId"))
+            ExecuteSql(connection, "ALTER TABLE WorkSessions ADD COLUMN TagCloudId TEXT");
+
+        // Ensure SyncMetadata table exists
+        ExecuteSql(connection, @"CREATE TABLE IF NOT EXISTS SyncMetadata (
+            Key TEXT PRIMARY KEY,
+            Value TEXT NOT NULL
+        )");
+    }
+    finally
+    {
+        connection.Close();
+    }
+}
+
+HashSet<string> GetTableColumns(System.Data.Common.DbConnection connection, string tableName)
+{
+    var columns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+    using var cmd = connection.CreateCommand();
+    cmd.CommandText = $"PRAGMA table_info({tableName})";
+    using var reader = cmd.ExecuteReader();
+    while (reader.Read())
+    {
+        columns.Add(reader.GetString(1)); // Column name is at index 1
+    }
+    return columns;
+}
+
+void ExecuteSql(System.Data.Common.DbConnection connection, string sql)
+{
+    using var cmd = connection.CreateCommand();
+    cmd.CommandText = sql;
+    cmd.ExecuteNonQuery();
 }
 
 // Configure the HTTP request pipeline
