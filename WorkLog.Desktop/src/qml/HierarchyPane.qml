@@ -36,16 +36,15 @@ Kirigami.ScrollablePage {
         Repeater {
             model: HierarchyModel.years
 
-            ColumnLayout {
-                spacing: 0
-                Layout.fillWidth: true
+            Column {
+                width: parent.width
 
                 property int yearValue: modelData
                 property bool isExpanded: HierarchyModel.selectedYear === yearValue
 
                 // Year item
                 QQC2.ItemDelegate {
-                    Layout.fillWidth: true
+                    width: parent.width
                     text: i18n("%1 (%2h/wk)",
                                String(yearValue),
                                HierarchyModel.yearAverageHoursPerWeek(yearValue).toFixed(1))
@@ -61,25 +60,23 @@ Kirigami.ScrollablePage {
                 }
 
                 // Months for this year (nested under year)
-                ColumnLayout {
+                Column {
                     visible: isExpanded
-                    spacing: 0
-                    Layout.fillWidth: true
-                    Layout.leftMargin: Kirigami.Units.gridUnit
+                    width: parent.width
+                    leftPadding: Kirigami.Units.gridUnit
 
                     Repeater {
                         model: isExpanded ? HierarchyModel.getMonths() : []
 
-                        ColumnLayout {
-                            spacing: 0
-                            Layout.fillWidth: true
+                        Column {
+                            width: parent.width - Kirigami.Units.gridUnit
 
                             property int monthValue: modelData
                             property bool monthExpanded: HierarchyModel.selectedMonth === monthValue
 
                             // Month item
                             QQC2.ItemDelegate {
-                                Layout.fillWidth: true
+                                width: parent.width
                                 text: i18n("%1 (%2h/wk)",
                                            HierarchyModel.monthName(monthValue),
                                            HierarchyModel.monthAverageHoursPerWeek(monthValue).toFixed(1))
@@ -95,25 +92,23 @@ Kirigami.ScrollablePage {
                             }
 
                             // Weeks for this month (nested under month)
-                            ColumnLayout {
+                            Column {
                                 visible: monthExpanded
-                                spacing: 0
-                                Layout.fillWidth: true
-                                Layout.leftMargin: Kirigami.Units.gridUnit
+                                width: parent.width
+                                leftPadding: Kirigami.Units.gridUnit
 
                                 Repeater {
                                     model: monthExpanded ? HierarchyModel.getWeeks() : []
 
-                                    ColumnLayout {
-                                        spacing: 0
-                                        Layout.fillWidth: true
+                                    Column {
+                                        width: parent.width - Kirigami.Units.gridUnit
 
                                         property int weekValue: modelData
                                         property bool weekExpanded: HierarchyModel.selectedWeek === weekValue
 
                                         // Week item
                                         QQC2.ItemDelegate {
-                                            Layout.fillWidth: true
+                                            width: parent.width
                                             text: i18n("%1 (%2h)",
                                                        HierarchyModel.weekLabel(weekValue),
                                                        HierarchyModel.weekTotalHours(weekValue).toFixed(1))
@@ -129,17 +124,16 @@ Kirigami.ScrollablePage {
                                         }
 
                                         // Days for this week (nested under week)
-                                        ColumnLayout {
+                                        Column {
                                             visible: weekExpanded
-                                            spacing: 0
-                                            Layout.fillWidth: true
-                                            Layout.leftMargin: Kirigami.Units.gridUnit
+                                            width: parent.width
+                                            leftPadding: Kirigami.Units.gridUnit
 
                                             Repeater {
                                                 model: weekExpanded ? HierarchyModel.getDays() : []
 
                                                 QQC2.ItemDelegate {
-                                                    Layout.fillWidth: true
+                                                    width: parent.width - Kirigami.Units.gridUnit
                                                     property date itemDate: modelData
                                                     text: i18n("%1 (%2h)",
                                                                Qt.formatDate(itemDate, "ddd, MMM d"),
