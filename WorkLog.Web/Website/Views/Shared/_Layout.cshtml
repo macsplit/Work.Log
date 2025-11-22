@@ -3,7 +3,16 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <title>@ViewData["Title"] - Work Log</title>
+    <!-- Critical CSS to prevent dark mode flash -->
+    <style>
+        :root { --bg-color: #f9fafb; --card-bg: #ffffff; }
+        @@media (prefers-color-scheme: dark) {
+            :root { --bg-color: #111827; --card-bg: #1f2937; }
+        }
+        html, body { background-color: var(--bg-color); }
+    </style>
     <link rel="stylesheet" href="/css/site.css" />
     <link rel="stylesheet" href="/lib/highlightjs/github.min.css" />
     <link rel="stylesheet" href="/lib/highlightjs/github-dark.min.css" media="(prefers-color-scheme: dark)" />
