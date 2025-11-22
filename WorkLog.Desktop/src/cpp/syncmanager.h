@@ -76,7 +76,8 @@ private:
     QString configFilePath() const;
     QString signRequest(const QString &method, const QString &service,
                        const QString &host, const QString &canonicalUri,
-                       const QString &payload, const QDateTime &timestamp);
+                       const QString &payload, const QDateTime &timestamp,
+                       const QString &amzTarget);
     QByteArray hmacSha256(const QByteArray &key, const QByteArray &data);
     QString hashSha256(const QString &data);
 

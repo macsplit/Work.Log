@@ -187,6 +187,7 @@ void SyncManager::testConnection()
     QString host = QStringLiteral("dynamodb.%1.amazonaws.com").arg(m_config.awsRegion);
     QUrl url(QStringLiteral("https://%1").arg(host));
     QDateTime timestamp = QDateTime::currentDateTimeUtc();
+    QString amzTarget = QStringLiteral("DynamoDB_20120810.DescribeTable");
 
     QJsonObject payload;
     payload[QStringLiteral("TableName")] = m_config.sessionsTableName;
@@ -194,12 +195,12 @@ void SyncManager::testConnection()
 
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/x-amz-json-1.0"));
-    request.setRawHeader("X-Amz-Target", "DynamoDB_20120810.DescribeTable");
+    request.setRawHeader("X-Amz-Target", amzTarget.toLatin1());
     request.setRawHeader("X-Amz-Date", timestamp.toString(QStringLiteral("yyyyMMddTHHmmssZ")).toLatin1());
     request.setRawHeader("Host", host.toLatin1());
 
     QString authHeader = signRequest(QStringLiteral("POST"), QStringLiteral("dynamodb"),
-                                     host, QStringLiteral("/"), QString::fromUtf8(payloadBytes), timestamp);
+                                     host, QStringLiteral("/"), QString::fromUtf8(payloadBytes), timestamp, amzTarget);
     request.setRawHeader("Authorization", authHeader.toLatin1());
 
     request.setAttribute(QNetworkRequest::User, QStringLiteral("test"));
@@ -212,6 +213,7 @@ void SyncManager::queryTable(const QString &tableName, const QString &operation)
     QString host = QStringLiteral("dynamodb.%1.amazonaws.com").arg(m_config.awsRegion);
     QUrl url(QStringLiteral("https://%1").arg(host));
     QDateTime timestamp = QDateTime::currentDateTimeUtc();
+    QString amzTarget = QStringLiteral("DynamoDB_20120810.Query");
 
     QJsonObject payload;
     payload[QStringLiteral("TableName")] = tableName;
@@ -227,12 +229,12 @@ void SyncManager::queryTable(const QString &tableName, const QString &operation)
 
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/x-amz-json-1.0"));
-    request.setRawHeader("X-Amz-Target", "DynamoDB_20120810.Query");
+    request.setRawHeader("X-Amz-Target", amzTarget.toLatin1());
     request.setRawHeader("X-Amz-Date", timestamp.toString(QStringLiteral("yyyyMMddTHHmmssZ")).toLatin1());
     request.setRawHeader("Host", host.toLatin1());
 
     QString authHeader = signRequest(QStringLiteral("POST"), QStringLiteral("dynamodb"),
-                                     host, QStringLiteral("/"), QString::fromUtf8(payloadBytes), timestamp);
+                                     host, QStringLiteral("/"), QString::fromUtf8(payloadBytes), timestamp, amzTarget);
     request.setRawHeader("Authorization", authHeader.toLatin1());
 
     request.setAttribute(QNetworkRequest::User, operation);
@@ -246,6 +248,7 @@ void SyncManager::putItem(const QString &tableName, const QJsonObject &item)
     QString host = QStringLiteral("dynamodb.%1.amazonaws.com").arg(m_config.awsRegion);
     QUrl url(QStringLiteral("https://%1").arg(host));
     QDateTime timestamp = QDateTime::currentDateTimeUtc();
+    QString amzTarget = QStringLiteral("DynamoDB_20120810.PutItem");
 
     QJsonObject payload;
     payload[QStringLiteral("TableName")] = tableName;
@@ -255,12 +258,12 @@ void SyncManager::putItem(const QString &tableName, const QJsonObject &item)
 
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/x-amz-json-1.0"));
-    request.setRawHeader("X-Amz-Target", "DynamoDB_20120810.PutItem");
+    request.setRawHeader("X-Amz-Target", amzTarget.toLatin1());
     request.setRawHeader("X-Amz-Date", timestamp.toString(QStringLiteral("yyyyMMddTHHmmssZ")).toLatin1());
     request.setRawHeader("Host", host.toLatin1());
 
     QString authHeader = signRequest(QStringLiteral("POST"), QStringLiteral("dynamodb"),
-                                     host, QStringLiteral("/"), QString::fromUtf8(payloadBytes), timestamp);
+                                     host, QStringLiteral("/"), QString::fromUtf8(payloadBytes), timestamp, amzTarget);
     request.setRawHeader("Authorization", authHeader.toLatin1());
 
     request.setAttribute(QNetworkRequest::User, QStringLiteral("put"));
@@ -673,7 +676,8 @@ void SyncManager::updateLastSyncTime()
 // AWS Signature Version 4 implementation
 QString SyncManager::signRequest(const QString &method, const QString &service,
                                   const QString &host, const QString &canonicalUri,
-                                  const QString &payload, const QDateTime &timestamp)
+                                  const QString &payload, const QDateTime &timestamp,
+                                  const QString &amzTarget)
 {
     QString amzDate = timestamp.toString(QStringLiteral("yyyyMMddTHHmmssZ"));
     QString dateStamp = timestamp.toString(QStringLiteral("yyyyMMdd"));
@@ -683,7 +687,7 @@ QString SyncManager::signRequest(const QString &method, const QString &service,
     QString canonicalHeaders = QStringLiteral("content-type:application/x-amz-json-1.0\n")
         + QStringLiteral("host:%1\n").arg(host)
         + QStringLiteral("x-amz-date:%1\n").arg(amzDate)
-        + QStringLiteral("x-amz-target:DynamoDB_20120810.Query\n");
+        + QStringLiteral("x-amz-target:%1\n").arg(amzTarget);
 
     QString payloadHash = hashSha256(payload);
     QString canonicalRequest = method + QStringLiteral("\n")
