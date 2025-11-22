@@ -61,7 +61,10 @@ void ApplyMigrations(WorkLogDbContext dbContext)
             ExecuteSql(connection, "ALTER TABLE Tags ADD COLUMN CloudId TEXT");
 
         if (!columns.Contains("UpdatedAt"))
-            ExecuteSql(connection, "ALTER TABLE Tags ADD COLUMN UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))");
+        {
+            ExecuteSql(connection, "ALTER TABLE Tags ADD COLUMN UpdatedAt TEXT");
+            ExecuteSql(connection, "UPDATE Tags SET UpdatedAt = datetime('now') WHERE UpdatedAt IS NULL");
+        }
 
         if (!columns.Contains("IsDeleted"))
             ExecuteSql(connection, "ALTER TABLE Tags ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0");
