@@ -1,10 +1,87 @@
 // Work Log - Main JavaScript file
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Work Log application loaded');
+    initAjaxNavigation();
     initHierarchyScrollPersistence();
     renderSessionNotesMarkdown();
 });
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', function(e) {
+    if (e.state && e.state.ajax) {
+        loadPageContent(location.href, false);
+    }
+});
+
+// AJAX navigation to prevent dark mode flash
+function initAjaxNavigation() {
+    document.addEventListener('click', function(e) {
+        // Find if click was on a tree navigation link
+        const link = e.target.closest('.hierarchy-panel a:not([target])');
+        if (!link) return;
+
+        // Skip if modifier keys pressed (user wants new tab etc)
+        if (e.ctrlKey || e.metaKey || e.shiftKey) return;
+
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+        // Only handle same-origin navigation
+        const url = new URL(href, location.origin);
+        if (url.origin !== location.origin) return;
+
+        e.preventDefault();
+        loadPageContent(href, true);
+    });
+}
+
+async function loadPageContent(url, pushState) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            // Fall back to regular navigation on error
+            location.href = url;
+            return;
+        }
+
+        const html = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Update hierarchy panel
+        const newHierarchy = doc.querySelector('.hierarchy-panel');
+        const oldHierarchy = document.querySelector('.hierarchy-panel');
+        if (newHierarchy && oldHierarchy) {
+            // Preserve scroll position
+            const scrollTop = oldHierarchy.scrollTop;
+            oldHierarchy.innerHTML = newHierarchy.innerHTML;
+            oldHierarchy.scrollTop = scrollTop;
+        }
+
+        // Update content panel
+        const newContent = doc.querySelector('.content-panel');
+        const oldContent = document.querySelector('.content-panel');
+        if (newContent && oldContent) {
+            oldContent.innerHTML = newContent.innerHTML;
+            // Re-render markdown in new content
+            renderSessionNotesMarkdown();
+        }
+
+        // Update page title
+        const newTitle = doc.querySelector('title');
+        if (newTitle) {
+            document.title = newTitle.textContent;
+        }
+
+        // Update URL
+        if (pushState) {
+            history.pushState({ ajax: true }, '', url);
+        }
+    } catch (error) {
+        console.error('AJAX navigation failed:', error);
+        location.href = url;
+    }
+}
 
 // Keep the hierarchy panel scroll position while navigating between dates
 function initHierarchyScrollPersistence() {
