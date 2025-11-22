@@ -29,8 +29,8 @@ WORKDIR /app
 # Create data directory for SQLite database
 RUN mkdir -p /data && chown -R app:app /data
 
-# Copy published files
-COPY --from=publish /app/publish .
+# Copy published files and set ownership for non-root user
+COPY --from=publish --chown=app:app /app/publish .
 
 # Set environment variables
 ENV ASPNETCORE_URLS=http://+:80
