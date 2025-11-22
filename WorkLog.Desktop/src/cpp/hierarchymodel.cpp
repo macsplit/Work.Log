@@ -145,3 +145,45 @@ QString HierarchyModel::weekLabel(int week) const
 {
     return tr("Week %1").arg(week);
 }
+
+double HierarchyModel::weekTotalHours(int week) const
+{
+    if (m_selectedYear == 0 || week <= 0)
+        return 0.0;
+    return m_database->getTotalHoursForWeek(m_selectedYear, week);
+}
+
+double HierarchyModel::monthTotalHours(int month) const
+{
+    if (m_selectedYear == 0 || month <= 0)
+        return 0.0;
+    return m_database->getTotalHoursForMonth(m_selectedYear, month);
+}
+
+double HierarchyModel::yearTotalHours(int year) const
+{
+    if (year <= 0)
+        return 0.0;
+    return m_database->getTotalHoursForYear(year);
+}
+
+double HierarchyModel::dayTotalHours(const QDate &date) const
+{
+    if (!date.isValid())
+        return 0.0;
+    return m_database->getTotalHoursForDate(date);
+}
+
+double HierarchyModel::yearAverageHoursPerWeek(int year) const
+{
+    if (year <= 0)
+        return 0.0;
+    return m_database->getAverageHoursPerWeekForYear(year);
+}
+
+double HierarchyModel::monthAverageHoursPerWeek(int month) const
+{
+    if (m_selectedYear == 0 || month <= 0)
+        return 0.0;
+    return m_database->getAverageHoursPerWeekForMonth(m_selectedYear, month);
+}

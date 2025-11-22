@@ -21,8 +21,11 @@
                 <ul class="hierarchy-list">
                     @foreach (var year in Model.Years)
                     {
+                        var avgPerWeek = Model.YearAverageHoursPerWeek.TryGetValue(year, out var yAvg) ? yAvg : 0.0;
                         <li class="@(Model.SelectedYear == year ? "selected" : "")">
-                            <a asp-action="Index" asp-route-year="@year">@year</a>
+                            <a asp-action="Index" asp-route-year="@year">
+                                @year (@avgPerWeek.ToString("0.0")h/wk)
+                            </a>
                         </li>
                     }
                 </ul>
@@ -41,10 +44,13 @@
                 <ul class="hierarchy-list">
                     @foreach (var month in Model.Months)
                     {
+                        var avgPerWeek = Model.MonthAverageHoursPerWeek.TryGetValue(month, out var mAvg) ? mAvg : 0.0;
                         <li class="@(Model.SelectedMonth == month ? "selected" : "")">
                             <a asp-action="Index"
                                asp-route-year="@Model.SelectedYear"
-                               asp-route-month="@month">@Model.GetMonthName(month)</a>
+                               asp-route-month="@month">
+                                @Model.GetMonthName(month) (@avgPerWeek.ToString("0.0")h/wk)
+                            </a>
                         </li>
                     }
                 </ul>
@@ -59,11 +65,14 @@
                 <ul class="hierarchy-list">
                     @foreach (var week in Model.Weeks)
                     {
+                        var total = Model.WeekTotalHours.TryGetValue(week, out var wTotal) ? wTotal : 0.0;
                         <li class="@(Model.SelectedWeek == week ? "selected" : "")">
                             <a asp-action="Index"
                                asp-route-year="@Model.SelectedYear"
                                asp-route-month="@Model.SelectedMonth"
-                               asp-route-week="@week">@Model.GetWeekLabel(week)</a>
+                               asp-route-week="@week">
+                                @Model.GetWeekLabel(week) (@total.ToString("0.0")h)
+                            </a>
                         </li>
                     }
                 </ul>
@@ -78,12 +87,15 @@
                 <ul class="hierarchy-list">
                     @foreach (var day in Model.Days)
                     {
+                        var total = Model.DayTotalHours.TryGetValue(day, out var dTotal) ? dTotal : 0.0;
                         <li class="@(Model.SelectedDate == day ? "selected" : "")">
                             <a asp-action="Index"
                                asp-route-year="@Model.SelectedYear"
                                asp-route-month="@Model.SelectedMonth"
                                asp-route-week="@Model.SelectedWeek"
-                               asp-route-date="@day.ToString("yyyy-MM-dd")">@Model.GetDayLabel(day)</a>
+                               asp-route-date="@day.ToString("yyyy-MM-dd")">
+                                @Model.GetDayLabel(day) (@total.ToString("0.0")h)
+                            </a>
                         </li>
                     }
                 </ul>
@@ -135,7 +147,7 @@
                                 {
                                     <div class="session-notes">
                                         <strong>Notes:</strong>
-                                        <p>@session.Notes</p>
+                                        <div class="session-notes-content">@session.Notes</div>
                                     </div>
                                 }
                                 @if (!string.IsNullOrEmpty(session.NextPlannedStage))

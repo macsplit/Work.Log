@@ -48,6 +48,12 @@ public:
     Q_INVOKABLE QVariantList getWeeksForMonth(int year, int month);
     Q_INVOKABLE QVariantList getDaysForWeek(int year, int week);
     Q_INVOKABLE QVariantList getDaysForMonth(int year, int month);
+    Q_INVOKABLE double getTotalHoursForWeek(int year, int week);
+    Q_INVOKABLE double getTotalHoursForMonth(int year, int month);
+    Q_INVOKABLE double getTotalHoursForYear(int year);
+    Q_INVOKABLE double getTotalHoursForDate(const QDate &date);
+    Q_INVOKABLE double getAverageHoursPerWeekForYear(int year);
+    Q_INVOKABLE double getAverageHoursPerWeekForMonth(int year, int month);
 
     QString databasePath() const;
 

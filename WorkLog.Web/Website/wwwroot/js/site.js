@@ -2,6 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Work Log application loaded');
+    renderSessionNotesMarkdown();
 });
 
 // Modal functions
@@ -213,6 +214,41 @@ async function refreshTagDropdown() {
     } catch (error) {
         console.error('Failed to refresh tag dropdown:', error);
     }
+}
+
+function renderSessionNotesMarkdown() {
+    if (!window.markdownit || !window.hljs) {
+        console.warn('Markdown rendering skipped because supporting libraries are missing.');
+        return;
+    }
+
+    const md = window.markdownit({
+        html: false,
+        linkify: true,
+        breaks: true,
+        highlight: function(str, lang) {
+            try {
+                if (lang && hljs.getLanguage(lang)) {
+                    return `<pre class="hljs"><code>${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`;
+                }
+
+                return `<pre class="hljs"><code>${hljs.highlightAuto(str).value}</code></pre>`;
+            } catch (error) {
+                const safe = md.utils.escapeHtml(str);
+                return `<pre class="hljs"><code>${safe}</code></pre>`;
+            }
+        }
+    });
+
+    document.querySelectorAll('.session-notes-content').forEach((el) => {
+        const raw = el.textContent || '';
+        if (!raw.trim()) {
+            return;
+        }
+
+        const rendered = md.render(raw);
+        el.innerHTML = rendered;
+    });
 }
 
 function escapeHtml(text) {

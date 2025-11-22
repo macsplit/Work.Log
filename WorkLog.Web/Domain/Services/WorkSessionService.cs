@@ -169,6 +169,53 @@ public class WorkSessionService : IWorkSessionService
             .SumAsync(s => s.TimeHours);
     }
 
+    public async Task<double> GetTotalHoursForWeek(int userId, int year, int week)
+    {
+        var sessions = await _context.WorkSessions
+            .Where(s => s.UserId == userId && s.SessionDate.Year == year)
+            .ToListAsync();
+
+        return sessions
+            .Where(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)) == week)
+            .Sum(s => s.TimeHours);
+    }
+
+    public async Task<double> GetAverageHoursPerWeekForYear(int userId, int year)
+    {
+        var sessions = await _context.WorkSessions
+            .Where(s => s.UserId == userId && s.SessionDate.Year == year)
+            .ToListAsync();
+
+        var weekGroups = sessions
+            .GroupBy(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)))
+            .ToList();
+
+        if (!weekGroups.Any())
+            return 0.0;
+
+        var totalHours = weekGroups.Sum(g => g.Sum(s => s.TimeHours));
+        return totalHours / weekGroups.Count;
+    }
+
+    public async Task<double> GetAverageHoursPerWeekForMonth(int userId, int year, int month)
+    {
+        var sessions = await _context.WorkSessions
+            .Where(s => s.UserId == userId &&
+                        s.SessionDate.Year == year &&
+                        s.SessionDate.Month == month)
+            .ToListAsync();
+
+        var weekGroups = sessions
+            .GroupBy(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)))
+            .ToList();
+
+        if (!weekGroups.Any())
+            return 0.0;
+
+        var totalHours = weekGroups.Sum(g => g.Sum(s => s.TimeHours));
+        return totalHours / weekGroups.Count;
+    }
+
     private static int GetIsoWeekOfYear(DateTime date)
     {
         var cal = CultureInfo.InvariantCulture.Calendar;

@@ -419,6 +419,31 @@ textarea.form-control {
     border: none;
 }
 
+.session-notes-content p,
+.session-notes-content ul,
+.session-notes-content ol,
+.session-notes-content pre {
+    margin: 0.35rem 0;
+}
+
+.session-notes-content ul,
+.session-notes-content ol {
+    padding-left: 1.25rem;
+}
+
+.session-notes-content :not(pre) > code {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9em;
+    background-color: rgba(107, 114, 128, 0.15);
+    padding: 0.1rem 0.25rem;
+    border-radius: 0.25rem;
+}
+
+.session-notes-content pre {
+    overflow-x: auto;
+    border-radius: 0.5rem;
+}
+
 .delete-form {
     display: inline;
 }
@@ -640,5 +665,9 @@ textarea.form-control {
     .validation-summary,
     .validation-message {
         color: var(--danger-color);
+    }
+
+    .session-notes-content :not(pre) > code {
+        background-color: rgba(156, 163, 175, 0.2);
     }
 }

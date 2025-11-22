@@ -34,13 +34,29 @@ public class HomeController : Controller
             SelectedWeek = week
         };
 
+        // Year averages
+        foreach (var y in viewModel.Years)
+        {
+            viewModel.YearAverageHoursPerWeek[y] = await _sessionService.GetAverageHoursPerWeekForYear(userId, y);
+        }
+
         if (year.HasValue)
         {
             viewModel.Months = (await _sessionService.GetMonthsForYear(userId, year.Value)).ToList();
 
+            foreach (var m in viewModel.Months)
+            {
+                viewModel.MonthAverageHoursPerWeek[m] = await _sessionService.GetAverageHoursPerWeekForMonth(userId, year.Value, m);
+            }
+
             if (month.HasValue)
             {
                 viewModel.Weeks = (await _sessionService.GetWeeksForMonth(userId, year.Value, month.Value)).ToList();
+
+                foreach (var w in viewModel.Weeks)
+                {
+                    viewModel.WeekTotalHours[w] = await _sessionService.GetTotalHoursForWeek(userId, year.Value, w);
+                }
 
                 if (week.HasValue)
                 {
@@ -49,6 +65,11 @@ public class HomeController : Controller
                 else
                 {
                     viewModel.Days = (await _sessionService.GetDaysForMonth(userId, year.Value, month.Value)).ToList();
+                }
+
+                foreach (var day in viewModel.Days)
+                {
+                    viewModel.DayTotalHours[day] = await _sessionService.GetTotalHoursForDate(userId, day);
                 }
             }
         }

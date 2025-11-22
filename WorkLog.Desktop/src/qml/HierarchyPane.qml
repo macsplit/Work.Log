@@ -27,7 +27,10 @@ Kirigami.ScrollablePage {
 
             QQC2.ItemDelegate {
                 Layout.fillWidth: true
-                text: modelData
+                // Use string conversion to avoid locale digit grouping (e.g., 2,024)
+                text: i18n("%1 (%2h/wk)",
+                           String(modelData),
+                           HierarchyModel.yearAverageHoursPerWeek(modelData).toFixed(1))
                 highlighted: HierarchyModel.selectedYear === modelData
                 icon.name: HierarchyModel.selectedYear === modelData ? "go-down" : "go-next"
                 onClicked: {
@@ -69,7 +72,9 @@ Kirigami.ScrollablePage {
 
                 QQC2.ItemDelegate {
                     Layout.fillWidth: true
-                    text: HierarchyModel.monthName(modelData)
+                    text: i18n("%1 (%2h/wk)",
+                               HierarchyModel.monthName(modelData),
+                               HierarchyModel.monthAverageHoursPerWeek(modelData).toFixed(1))
                     highlighted: HierarchyModel.selectedMonth === modelData
                     icon.name: HierarchyModel.selectedMonth === modelData ? "go-down" : "go-next"
                     onClicked: {
@@ -103,7 +108,9 @@ Kirigami.ScrollablePage {
 
                 QQC2.ItemDelegate {
                     Layout.fillWidth: true
-                    text: HierarchyModel.weekLabel(modelData)
+                    text: i18n("%1 (%2h)",
+                               HierarchyModel.weekLabel(modelData),
+                               HierarchyModel.weekTotalHours(modelData).toFixed(1))
                     highlighted: HierarchyModel.selectedWeek === modelData
                     icon.name: HierarchyModel.selectedWeek === modelData ? "go-down" : "go-next"
                     onClicked: {
@@ -139,7 +146,9 @@ Kirigami.ScrollablePage {
                 QQC2.ItemDelegate {
                     Layout.fillWidth: true
                     property date itemDate: modelData
-                    text: Qt.formatDate(itemDate, "ddd, MMM d")
+                    text: i18n("%1 (%2h)",
+                               Qt.formatDate(itemDate, "ddd, MMM d"),
+                               HierarchyModel.dayTotalHours(itemDate).toFixed(1))
                     icon.name: "view-calendar-day"
                     onClicked: {
                         root.dateSelected(itemDate)

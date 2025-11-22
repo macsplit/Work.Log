@@ -343,6 +343,120 @@ QVariantList DatabaseManager::getDaysForMonth(int year, int month)
     return results;
 }
 
+double DatabaseManager::getTotalHoursForWeek(int year, int week)
+{
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral(R"(
+        SELECT IFNULL(SUM(TimeHours), 0)
+        FROM WorkSessions
+        WHERE strftime('%Y', SessionDate) = :year
+          AND strftime('%W', SessionDate) = :week
+    )"));
+    query.bindValue(QStringLiteral(":year"), QString::number(year));
+    query.bindValue(QStringLiteral(":week"), QString::number(week).rightJustified(2, QLatin1Char('0')));
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toDouble();
+    }
+
+    return 0.0;
+}
+
+double DatabaseManager::getTotalHoursForMonth(int year, int month)
+{
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral(R"(
+        SELECT IFNULL(SUM(TimeHours), 0)
+        FROM WorkSessions
+        WHERE strftime('%Y', SessionDate) = :year
+          AND strftime('%m', SessionDate) = :month
+    )"));
+    query.bindValue(QStringLiteral(":year"), QString::number(year));
+    query.bindValue(QStringLiteral(":month"), QString::number(month).rightJustified(2, QLatin1Char('0')));
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toDouble();
+    }
+
+    return 0.0;
+}
+
+double DatabaseManager::getTotalHoursForYear(int year)
+{
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral(R"(
+        SELECT IFNULL(SUM(TimeHours), 0)
+        FROM WorkSessions
+        WHERE strftime('%Y', SessionDate) = :year
+    )"));
+    query.bindValue(QStringLiteral(":year"), QString::number(year));
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toDouble();
+    }
+
+    return 0.0;
+}
+
+double DatabaseManager::getTotalHoursForDate(const QDate &date)
+{
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral(R"(
+        SELECT IFNULL(SUM(TimeHours), 0)
+        FROM WorkSessions
+        WHERE SessionDate = :date
+    )"));
+    query.bindValue(QStringLiteral(":date"), date.toString(Qt::ISODate));
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toDouble();
+    }
+
+    return 0.0;
+}
+
+double DatabaseManager::getAverageHoursPerWeekForYear(int year)
+{
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral(R"(
+        SELECT IFNULL(SUM(TimeHours), 0) as TotalHours,
+               COUNT(DISTINCT strftime('%W', SessionDate)) as WeekCount
+        FROM WorkSessions
+        WHERE strftime('%Y', SessionDate) = :year
+    )"));
+    query.bindValue(QStringLiteral(":year"), QString::number(year));
+
+    if (query.exec() && query.next()) {
+        const double total = query.value(QStringLiteral("TotalHours")).toDouble();
+        const int weeks = query.value(QStringLiteral("WeekCount")).toInt();
+        return weeks > 0 ? total / weeks : 0.0;
+    }
+
+    return 0.0;
+}
+
+double DatabaseManager::getAverageHoursPerWeekForMonth(int year, int month)
+{
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral(R"(
+        SELECT IFNULL(SUM(TimeHours), 0) as TotalHours,
+               COUNT(DISTINCT strftime('%W', SessionDate)) as WeekCount
+        FROM WorkSessions
+        WHERE strftime('%Y', SessionDate) = :year
+          AND strftime('%m', SessionDate) = :month
+    )"));
+    query.bindValue(QStringLiteral(":year"), QString::number(year));
+    query.bindValue(QStringLiteral(":month"), QString::number(month).rightJustified(2, QLatin1Char('0')));
+
+    if (query.exec() && query.next()) {
+        const double total = query.value(QStringLiteral("TotalHours")).toDouble();
+        const int weeks = query.value(QStringLiteral("WeekCount")).toInt();
+        return weeks > 0 ? total / weeks : 0.0;
+    }
+
+    return 0.0;
+}
+
 // Tag CRUD operations
 
 int DatabaseManager::createTag(const QString &name)

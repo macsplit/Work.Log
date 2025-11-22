@@ -32,6 +32,12 @@ public:
 
     Q_INVOKABLE QString monthName(int month) const;
     Q_INVOKABLE QString weekLabel(int week) const;
+    Q_INVOKABLE double weekTotalHours(int week) const;
+    Q_INVOKABLE double monthTotalHours(int month) const;
+    Q_INVOKABLE double yearTotalHours(int year) const;
+    Q_INVOKABLE double dayTotalHours(const QDate &date) const;
+    Q_INVOKABLE double yearAverageHoursPerWeek(int year) const;
+    Q_INVOKABLE double monthAverageHoursPerWeek(int month) const;
 
 signals:
     void yearsChanged();

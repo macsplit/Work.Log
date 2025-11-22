@@ -16,6 +16,10 @@ public class HierarchyViewModel
 
     public List<WorkSession> Sessions { get; set; } = new();
     public double TotalHours { get; set; }
+    public Dictionary<int, double> YearAverageHoursPerWeek { get; set; } = new();
+    public Dictionary<int, double> MonthAverageHoursPerWeek { get; set; } = new();
+    public Dictionary<int, double> WeekTotalHours { get; set; } = new();
+    public Dictionary<DateOnly, double> DayTotalHours { get; set; } = new();
 
     public string GetMonthName(int month)
     {

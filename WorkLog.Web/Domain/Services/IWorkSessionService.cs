@@ -30,4 +30,7 @@ public interface IWorkSessionService
 
     // Summary
     Task<double> GetTotalHoursForDate(int userId, DateOnly date);
+    Task<double> GetTotalHoursForWeek(int userId, int year, int week);
+    Task<double> GetAverageHoursPerWeekForYear(int userId, int year);
+    Task<double> GetAverageHoursPerWeekForMonth(int userId, int year, int month);
 }

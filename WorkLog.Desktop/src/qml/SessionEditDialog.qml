@@ -21,6 +21,8 @@ QQC2.Dialog {
     width: Math.min(parent.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 30)
     anchors.centerIn: parent
 
+    onTagIdChanged: tagComboBox.refreshSelection()
+
     onOpened: descriptionField.forceActiveFocus()
 
     onAccepted: {
@@ -160,11 +162,14 @@ QQC2.Dialog {
                         Layout.fillWidth: true
                         model: TagModel
                         textRole: "tagName"
-                        currentIndex: TagModel.getIndexById(root.tagId)
+
+                        function refreshSelection() {
+                            currentIndex = TagModel.getIndexById(root.tagId)
+                        }
 
                         displayText: currentIndex >= 0 ? currentText : i18n("No tag")
 
-                        Component.onCompleted: currentIndex = TagModel.getIndexById(root.tagId)
+                        Component.onCompleted: refreshSelection()
 
                         // Allow clearing the selection
                         onActivated: {
@@ -238,5 +243,12 @@ QQC2.Dialog {
 
     TagManagementDialog {
         id: tagManagementDialog
+    }
+
+    Connections {
+        target: TagModel
+        function onCountChanged() {
+            tagComboBox.refreshSelection()
+        }
     }
 }
