@@ -250,10 +250,26 @@ Key files:
 
 ## License
 
-[Add your license here]
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ## Contributing
 
-[Add contribution guidelines here]
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## Screenshots
+
+### Desktop App (KDE Kirigami)
+![Desktop App - Main View](screenshots/desktop-main.png)
+
+### Web App
+![Web App - Dashboard](screenshots/web-dashboard.png)
+
+---
+
+## Author
+
+**Lee Hanken** - [@macsplit](https://github.com/macsplit)

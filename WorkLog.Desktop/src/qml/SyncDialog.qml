@@ -132,7 +132,7 @@ QQC2.Dialog {
             QQC2.TextField {
                 id: accessKeyField
                 Kirigami.FormData.label: i18n("AWS Access Key ID:")
-                placeholderText: i18n("AKIAIOSFODNN7EXAMPLE")
+                placeholderText: i18n("Your AWS Access Key ID")
                 text: SyncManager.getAwsAccessKeyId()
             }
 
