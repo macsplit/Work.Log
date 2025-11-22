@@ -64,8 +64,6 @@ void SyncManager::loadConfiguration()
         m_config.tagsTableName = obj[QStringLiteral("TagsTableName")].toString();
     }
 
-    qDebug() << "Loaded config - Tables:" << m_config.sessionsTableName << m_config.tagsTableName;
-
     emit configurationChanged();
 }
 
@@ -221,14 +219,6 @@ void SyncManager::testConnection()
     payload[QStringLiteral("TableName")] = m_config.sessionsTableName;
     QByteArray payloadBytes = QJsonDocument(payload).toJson(QJsonDocument::Compact);
 
-    qDebug() << "=== Test Connection Debug ===";
-    qDebug() << "Host:" << host;
-    qDebug() << "URL:" << url;
-    qDebug() << "Region:" << m_config.awsRegion;
-    qDebug() << "Table:" << m_config.sessionsTableName;
-    qDebug() << "Payload:" << payloadBytes;
-    qDebug() << "Timestamp:" << timestamp.toString(QStringLiteral("yyyyMMddTHHmmssZ"));
-
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/x-amz-json-1.0"));
     request.setRawHeader("X-Amz-Target", amzTarget.toLatin1());
@@ -238,9 +228,6 @@ void SyncManager::testConnection()
     QString authHeader = signRequest(QStringLiteral("POST"), QStringLiteral("dynamodb"),
                                      host, QStringLiteral("/"), QString::fromUtf8(payloadBytes), timestamp, amzTarget);
     request.setRawHeader("Authorization", authHeader.toLatin1());
-
-    qDebug() << "Authorization:" << authHeader;
-
     request.setAttribute(QNetworkRequest::User, QStringLiteral("test"));
 
     m_networkManager->post(request, payloadBytes);
@@ -314,11 +301,6 @@ void SyncManager::onSyncRequestFinished(QNetworkReply *reply)
 {
     QString operation = reply->request().attribute(QNetworkRequest::User).toString();
     QByteArray responseData = reply->readAll();
-
-    qDebug() << "=== Response Debug ===";
-    qDebug() << "Operation:" << operation;
-    qDebug() << "HTTP Status:" << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-    qDebug() << "Response:" << responseData;
 
     if (reply->error() != QNetworkReply::NoError) {
         QString errorMsg = reply->errorString();
@@ -739,14 +721,6 @@ QString SyncManager::signRequest(const QString &method, const QString &service,
         + canonicalHeaders + QStringLiteral("\n")
         + signedHeaders + QStringLiteral("\n")
         + payloadHash;
-
-    qDebug() << "=== AWS Signature Debug ===";
-    qDebug() << "amzDate:" << amzDate;
-    qDebug() << "dateStamp:" << dateStamp;
-    qDebug() << "amzTarget:" << amzTarget;
-    qDebug() << "payloadHash:" << payloadHash;
-    qDebug() << "Canonical Headers:" << canonicalHeaders;
-    qDebug() << "Canonical Request:\n" << canonicalRequest;
 
     // Create string to sign
     QString algorithm = QStringLiteral("AWS4-HMAC-SHA256");
