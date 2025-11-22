@@ -18,17 +18,21 @@ Kirigami.ScrollablePage {
     leftPadding: Kirigami.Units.smallSpacing
     rightPadding: Kirigami.Units.smallSpacing
 
-    header: ColumnLayout {
+    header: Column {
+        width: parent.width
         spacing: 0
 
         Kirigami.Heading {
-            Layout.margins: Kirigami.Units.smallSpacing
+            leftPadding: Kirigami.Units.smallSpacing
+            rightPadding: Kirigami.Units.smallSpacing
+            topPadding: Kirigami.Units.smallSpacing
+            bottomPadding: Kirigami.Units.smallSpacing
             level: 4
             text: i18n("Work Sessions")
         }
 
         Kirigami.Separator {
-            Layout.fillWidth: true
+            width: parent.width
         }
     }
 
@@ -160,33 +164,44 @@ Kirigami.ScrollablePage {
         }
     }
 
-    footer: ColumnLayout {
+    footer: Column {
+        width: parent.width
         spacing: 0
 
         Kirigami.Separator {
-            Layout.fillWidth: true
+            width: parent.width
         }
 
-        RowLayout {
-            Layout.margins: Kirigami.Units.smallSpacing
+        Item {
+            width: parent.width
+            height: footerRow.height + Kirigami.Units.smallSpacing * 2
 
-            QQC2.Label {
-                text: i18n("Total: %1 hours", calculateTotal())
-                font.bold: true
+            Row {
+                id: footerRow
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: Kirigami.Units.smallSpacing
+                spacing: Kirigami.Units.smallSpacing
 
-                function calculateTotal() {
-                    var total = 0
-                    for (var i = 0; i < SessionModel.count; i++) {
-                        var session = SessionModel.get(i)
-                        total += session.timeHours
+                QQC2.Label {
+                    text: i18n("Total: %1 hours", calculateTotal())
+                    font.bold: true
+
+                    function calculateTotal() {
+                        var total = 0
+                        for (var i = 0; i < SessionModel.count; i++) {
+                            var session = SessionModel.get(i)
+                            total += session.timeHours
+                        }
+                        return total
                     }
-                    return total
                 }
             }
 
-            Item { Layout.fillWidth: true }
-
             QQC2.Label {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: Kirigami.Units.smallSpacing
                 text: i18np("%1 session", "%1 sessions", SessionModel.count)
                 opacity: 0.7
             }
