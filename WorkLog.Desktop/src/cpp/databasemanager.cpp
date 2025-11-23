@@ -263,7 +263,7 @@ QVariantList DatabaseManager::getYears()
     query.exec(QStringLiteral(R"(
         SELECT DISTINCT strftime('%Y', SessionDate) as Year
         FROM WorkSessions
-        ORDER BY Year DESC
+        ORDER BY Year ASC
     )"));
 
     while (query.next()) {

@@ -130,7 +130,7 @@ public class WorkSessionService : IWorkSessionService
             .Where(s => s.UserId == userId && !s.IsDeleted)
             .Select(s => s.SessionDate.Year)
             .Distinct()
-            .OrderByDescending(y => y)
+            .OrderBy(y => y)
             .ToListAsync();
     }
 
