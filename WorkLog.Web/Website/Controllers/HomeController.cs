@@ -61,6 +61,7 @@ public class HomeController : Controller
                 if (week.HasValue)
                 {
                     viewModel.Days = (await _sessionService.GetDaysForWeek(userId, year.Value, week.Value)).ToList();
+                    viewModel.TagTotals = (await _sessionService.GetTagTotalsForWeek(userId, year.Value, week.Value)).ToList();
                 }
                 else
                 {

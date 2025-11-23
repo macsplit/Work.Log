@@ -190,3 +190,17 @@ double HierarchyModel::monthAverageHoursPerWeek(int month) const
         return 0.0;
     return m_database->getAverageHoursPerWeekForMonth(m_selectedYear, month);
 }
+
+QVariantList HierarchyModel::getTagTotalsForSelectedWeek() const
+{
+    if (m_selectedYear == 0 || m_selectedWeek < 0)
+        return QVariantList();
+    return m_database->getTagTotalsForWeek(m_selectedYear, m_selectedWeek);
+}
+
+QVariantList HierarchyModel::getTagTotalsForDay(const QDate &date) const
+{
+    if (!date.isValid())
+        return QVariantList();
+    return m_database->getTagTotalsForDay(date);
+}

@@ -40,6 +40,8 @@ public:
     Q_INVOKABLE double dayTotalHours(const QDate &date) const;
     Q_INVOKABLE double yearAverageHoursPerWeek(int year) const;
     Q_INVOKABLE double monthAverageHoursPerWeek(int month) const;
+    Q_INVOKABLE QVariantList getTagTotalsForSelectedWeek() const;
+    Q_INVOKABLE QVariantList getTagTotalsForDay(const QDate &date) const;
 
 signals:
     void yearsChanged();

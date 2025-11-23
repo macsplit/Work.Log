@@ -1,4 +1,5 @@
 using WorkLog.Domain.Entities;
+using WorkLog.Domain.Services;
 
 namespace WorkLog.Website.Models;
 
@@ -20,6 +21,7 @@ public class HierarchyViewModel
     public Dictionary<int, double> MonthAverageHoursPerWeek { get; set; } = new();
     public Dictionary<int, double> WeekTotalHours { get; set; } = new();
     public Dictionary<DateOnly, double> DayTotalHours { get; set; } = new();
+    public List<TagTotal> TagTotals { get; set; } = new();
 
     public string GetMonthName(int month)
     {

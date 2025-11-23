@@ -242,6 +242,32 @@ public class WorkSessionService : IWorkSessionService
         return totalHours / weekGroups.Count;
     }
 
+    public async Task<IEnumerable<TagTotal>> GetTagTotalsForWeek(int userId, int year, int week)
+    {
+        var sessions = await _context.WorkSessions
+            .Include(s => s.Tag)
+            .Where(s => s.UserId == userId && s.SessionDate.Year == year && !s.IsDeleted)
+            .ToListAsync();
+
+        return sessions
+            .Where(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)) == week)
+            .GroupBy(s => s.Tag?.Name ?? "Untagged")
+            .Select(g => new TagTotal(g.Key, g.Sum(s => s.TimeHours)))
+            .OrderByDescending(t => t.TotalHours)
+            .ToList();
+    }
+
+    public async Task<IEnumerable<TagTotal>> GetTagTotalsForDay(int userId, DateOnly date)
+    {
+        return await _context.WorkSessions
+            .Include(s => s.Tag)
+            .Where(s => s.UserId == userId && s.SessionDate == date && !s.IsDeleted)
+            .GroupBy(s => s.Tag != null ? s.Tag.Name : "Untagged")
+            .Select(g => new TagTotal(g.Key, g.Sum(s => s.TimeHours)))
+            .OrderByDescending(t => t.TotalHours)
+            .ToListAsync();
+    }
+
     private static int GetIsoWeekOfYear(DateTime date)
     {
         var cal = CultureInfo.InvariantCulture.Calendar;

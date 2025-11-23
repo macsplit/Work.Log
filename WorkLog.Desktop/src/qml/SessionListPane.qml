@@ -172,6 +172,7 @@ Kirigami.ScrollablePage {
             width: parent.width
         }
 
+        // Day total row
         Item {
             width: parent.width
             height: footerRow.height + Kirigami.Units.smallSpacing * 2
@@ -184,7 +185,7 @@ Kirigami.ScrollablePage {
                 spacing: Kirigami.Units.smallSpacing
 
                 QQC2.Label {
-                    text: i18n("Total: %1 hours", calculateTotal())
+                    text: i18n("Day: %1 hours", calculateTotal())
                     font.bold: true
 
                     function calculateTotal() {
@@ -204,6 +205,49 @@ Kirigami.ScrollablePage {
                 anchors.rightMargin: Kirigami.Units.smallSpacing
                 text: i18np("%1 session", "%1 sessions", SessionModel.count)
                 opacity: 0.7
+            }
+        }
+
+        // Week tag totals strip (only visible when week is selected)
+        Column {
+            width: parent.width
+            visible: HierarchyModel.selectedWeek >= 0
+
+            Kirigami.Separator {
+                width: parent.width
+            }
+
+            Flow {
+                width: parent.width
+                padding: Kirigami.Units.smallSpacing
+                spacing: Kirigami.Units.smallSpacing
+
+                QQC2.Label {
+                    text: i18n("Week:")
+                    font.bold: true
+                }
+
+                Repeater {
+                    // Refresh when hierarchy changes
+                    model: (HierarchyModel.refreshCounter, HierarchyModel.selectedWeek >= 0)
+                           ? HierarchyModel.getTagTotalsForSelectedWeek() : []
+
+                    Rectangle {
+                        implicitWidth: tagTotalLabel.implicitWidth + Kirigami.Units.smallSpacing * 2
+                        implicitHeight: tagTotalLabel.implicitHeight + Kirigami.Units.smallSpacing
+                        radius: height / 2
+                        color: "transparent"
+                        border.width: 1
+                        border.color: Kirigami.Theme.disabledTextColor
+
+                        QQC2.Label {
+                            id: tagTotalLabel
+                            anchors.centerIn: parent
+                            text: modelData.tagName + " (" + modelData.totalHours.toFixed(1) + "h)"
+                            font.pixelSize: Kirigami.Theme.smallFont.pixelSize
+                        }
+                    }
+                }
             }
         }
     }

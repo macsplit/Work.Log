@@ -542,6 +542,33 @@ textarea.form-control {
     margin-left: 0.75rem;
 }
 
+/* Tag totals strip at bottom of sessions panel */
+.tag-totals-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    border-radius: 0 0 0.5rem 0.5rem;
+    margin-top: 1rem;
+}
+
+.tag-totals-label {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-right: 0.25rem;
+}
+
+.tag-total-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
 /* Tag input row */
 .tag-input-row {
     display: flex;

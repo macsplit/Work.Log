@@ -166,6 +166,17 @@
                            class="btn btn-primary">Add First Session</a>
                     </div>
                 }
+
+                @if (Model.TagTotals.Any())
+                {
+                    <div class="tag-totals-strip">
+                        <span class="tag-totals-label">Week:</span>
+                        @foreach (var tagTotal in Model.TagTotals)
+                        {
+                            <span class="tag-total-badge">@tagTotal.TagName (@tagTotal.TotalHours.ToString("0.0")h)</span>
+                        }
+                    </div>
+                }
             </div>
         }
         else

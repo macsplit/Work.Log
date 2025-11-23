@@ -477,6 +477,60 @@ double DatabaseManager::getAverageHoursPerWeekForMonth(int year, int month)
     return 0.0;
 }
 
+QVariantList DatabaseManager::getTagTotalsForWeek(int year, int week)
+{
+    QVariantList results;
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral(R"(
+        SELECT IFNULL(t.Name, 'Untagged') as TagName, SUM(w.TimeHours) as TotalHours
+        FROM WorkSessions w
+        LEFT JOIN Tags t ON w.TagId = t.Id
+        WHERE strftime('%Y', w.SessionDate) = :year
+          AND strftime('%W', w.SessionDate) = :week
+        GROUP BY IFNULL(t.Name, 'Untagged')
+        ORDER BY TotalHours DESC
+    )"));
+    query.bindValue(QStringLiteral(":year"), QString::number(year));
+    query.bindValue(QStringLiteral(":week"), QString::number(week).rightJustified(2, QLatin1Char('0')));
+
+    if (query.exec()) {
+        while (query.next()) {
+            QVariantMap item;
+            item[QStringLiteral("tagName")] = query.value(0).toString();
+            item[QStringLiteral("totalHours")] = query.value(1).toDouble();
+            results.append(item);
+        }
+    }
+
+    return results;
+}
+
+QVariantList DatabaseManager::getTagTotalsForDay(const QDate &date)
+{
+    QVariantList results;
+    QSqlQuery query(m_database);
+    query.prepare(QStringLiteral(R"(
+        SELECT IFNULL(t.Name, 'Untagged') as TagName, SUM(w.TimeHours) as TotalHours
+        FROM WorkSessions w
+        LEFT JOIN Tags t ON w.TagId = t.Id
+        WHERE w.SessionDate = :date
+        GROUP BY IFNULL(t.Name, 'Untagged')
+        ORDER BY TotalHours DESC
+    )"));
+    query.bindValue(QStringLiteral(":date"), date.toString(Qt::ISODate));
+
+    if (query.exec()) {
+        while (query.next()) {
+            QVariantMap item;
+            item[QStringLiteral("tagName")] = query.value(0).toString();
+            item[QStringLiteral("totalHours")] = query.value(1).toDouble();
+            results.append(item);
+        }
+    }
+
+    return results;
+}
+
 // Tag CRUD operations
 
 int DatabaseManager::createTag(const QString &name)

@@ -33,4 +33,13 @@ public interface IWorkSessionService
     Task<double> GetTotalHoursForWeek(int userId, int year, int week);
     Task<double> GetAverageHoursPerWeekForYear(int userId, int year);
     Task<double> GetAverageHoursPerWeekForMonth(int userId, int year, int month);
+
+    // Tag totals
+    Task<IEnumerable<TagTotal>> GetTagTotalsForWeek(int userId, int year, int week);
+    Task<IEnumerable<TagTotal>> GetTagTotalsForDay(int userId, DateOnly date);
 }
+
+/// <summary>
+/// Represents tag hours total.
+/// </summary>
+public record TagTotal(string TagName, double TotalHours);

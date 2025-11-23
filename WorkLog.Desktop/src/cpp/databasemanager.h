@@ -54,6 +54,8 @@ public:
     Q_INVOKABLE double getTotalHoursForDate(const QDate &date);
     Q_INVOKABLE double getAverageHoursPerWeekForYear(int year);
     Q_INVOKABLE double getAverageHoursPerWeekForMonth(int year, int month);
+    Q_INVOKABLE QVariantList getTagTotalsForWeek(int year, int week);
+    Q_INVOKABLE QVariantList getTagTotalsForDay(const QDate &date);
 
     QString databasePath() const;
 
