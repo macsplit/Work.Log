@@ -47,6 +47,7 @@ void HierarchyModel::refresh()
         m_selectedWeek = -1;
     }
 
+    m_refreshCounter++;
     emit yearsChanged();
     emit selectedYearChanged();
     emit selectedMonthChanged();

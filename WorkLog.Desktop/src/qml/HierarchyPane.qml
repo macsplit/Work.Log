@@ -66,7 +66,8 @@ Kirigami.ScrollablePage {
                     width: parent.width
 
                     Repeater {
-                        model: isExpanded ? HierarchyModel.getMonths() : []
+                        // refreshCounter dependency forces re-evaluation when data changes
+                        model: (HierarchyModel.refreshCounter, isExpanded) ? HierarchyModel.getMonths() : []
 
                         Column {
                             width: parent.width
@@ -98,7 +99,7 @@ Kirigami.ScrollablePage {
                                 width: parent.width
 
                                 Repeater {
-                                    model: monthExpanded ? HierarchyModel.getWeeks() : []
+                                    model: (HierarchyModel.refreshCounter, monthExpanded) ? HierarchyModel.getWeeks() : []
 
                                     Column {
                                         width: parent.width
@@ -130,7 +131,7 @@ Kirigami.ScrollablePage {
                                             width: parent.width
 
                                             Repeater {
-                                                model: weekExpanded ? HierarchyModel.getDays() : []
+                                                model: (HierarchyModel.refreshCounter, weekExpanded) ? HierarchyModel.getDays() : []
 
                                                 QQC2.ItemDelegate {
                                                     width: parent.width

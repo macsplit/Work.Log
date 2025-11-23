@@ -13,11 +13,13 @@ class HierarchyModel : public QObject
     Q_PROPERTY(int selectedYear READ selectedYear WRITE setSelectedYear NOTIFY selectedYearChanged)
     Q_PROPERTY(int selectedMonth READ selectedMonth WRITE setSelectedMonth NOTIFY selectedMonthChanged)
     Q_PROPERTY(int selectedWeek READ selectedWeek WRITE setSelectedWeek NOTIFY selectedWeekChanged)
+    Q_PROPERTY(int refreshCounter READ refreshCounter NOTIFY hierarchyChanged)
 
 public:
     explicit HierarchyModel(DatabaseManager *db, QObject *parent = nullptr);
 
     QVariantList years() const;
+    int refreshCounter() const { return m_refreshCounter; }
     int selectedYear() const;
     void setSelectedYear(int year);
     int selectedMonth() const;
@@ -55,6 +57,7 @@ private:
     int m_selectedYear = 0;
     int m_selectedMonth = 0;
     int m_selectedWeek = -1;  // -1 means no selection, 0+ are valid week numbers
+    int m_refreshCounter = 0;
 };
 
 #endif // HIERARCHYMODEL_H
