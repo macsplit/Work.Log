@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
+import Qt.labs.calendar 1.0
 import org.kde.kirigami 2.19 as Kirigami
 import org.worklog 1.0
 
@@ -18,8 +19,10 @@ QQC2.Dialog {
     title: sessionId < 0 ? i18n("New Work Session") : i18n("Edit Work Session")
     modal: true
     standardButtons: QQC2.Dialog.Save | QQC2.Dialog.Cancel
-    width: Math.min(parent.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 30)
+    width: Math.min(parent.width - Kirigami.Units.largeSpacing * 4, Kirigami.Units.gridUnit * 35)
     anchors.centerIn: parent
+    topPadding: Kirigami.Units.smallSpacing
+    bottomPadding: Kirigami.Units.gridUnit
 
     onTagIdChanged: tagComboBox.refreshSelection()
 
@@ -36,7 +39,7 @@ QQC2.Dialog {
 
     contentItem: QQC2.ScrollView {
         clip: true
-        implicitHeight: Kirigami.Units.gridUnit * 15
+        implicitHeight: Kirigami.Units.gridUnit * 16
 
         contentItem: Flickable {
             id: formFlick
@@ -49,10 +52,10 @@ QQC2.Dialog {
                 id: formLayout
                 width: formFlick.width
 
-                // Date picker (text + quick-adjust buttons)
+                // Date picker (text field with calendar button + quick-adjust buttons)
                 RowLayout {
                     Kirigami.FormData.label: i18n("Date:")
-                    Layout.topMargin: Kirigami.Units.smallSpacing
+                    spacing: Kirigami.Units.smallSpacing
 
                     QQC2.TextField {
                         id: dateField
@@ -78,10 +81,22 @@ QQC2.Dialog {
                     }
 
                     QQC2.ToolButton {
+                        id: calendarButton
+                        icon.name: "view-calendar"
+                        icon.width: Kirigami.Units.iconSizes.small
+                        icon.height: Kirigami.Units.iconSizes.small
+                        display: QQC2.AbstractButton.IconOnly
+                        QQC2.ToolTip.text: i18n("Open calendar")
+                        QQC2.ToolTip.visible: hovered
+                        onClicked: calendarDialog.open()
+                    }
+
+                    Item { width: Kirigami.Units.smallSpacing }  // Spacer
+
+                    QQC2.ToolButton {
                         icon.name: "go-previous"
                         icon.width: Kirigami.Units.iconSizes.small
                         icon.height: Kirigami.Units.iconSizes.small
-                        padding: Kirigami.Units.smallSpacing
                         display: QQC2.AbstractButton.IconOnly
                         QQC2.ToolTip.text: i18n("Previous day")
                         QQC2.ToolTip.visible: hovered
@@ -94,10 +109,9 @@ QQC2.Dialog {
                     }
 
                     QQC2.ToolButton {
-                        icon.name: "view-calendar-day"
+                        icon.name: "choice-rhomb"
                         icon.width: Kirigami.Units.iconSizes.small
                         icon.height: Kirigami.Units.iconSizes.small
-                        padding: Kirigami.Units.smallSpacing
                         display: QQC2.AbstractButton.IconOnly
                         QQC2.ToolTip.text: i18n("Today")
                         QQC2.ToolTip.visible: hovered
@@ -108,7 +122,6 @@ QQC2.Dialog {
                         icon.name: "go-next"
                         icon.width: Kirigami.Units.iconSizes.small
                         icon.height: Kirigami.Units.iconSizes.small
-                        padding: Kirigami.Units.smallSpacing
                         display: QQC2.AbstractButton.IconOnly
                         QQC2.ToolTip.text: i18n("Next day")
                         QQC2.ToolTip.visible: hovered
@@ -124,7 +137,6 @@ QQC2.Dialog {
                 // Time in hours
                 RowLayout {
                     Kirigami.FormData.label: i18n("Time (hours):")
-                    Layout.topMargin: Kirigami.Units.smallSpacing
 
                     QQC2.SpinBox {
                         id: hoursSpinBox
@@ -155,7 +167,6 @@ QQC2.Dialog {
                 // Tag selection
                 RowLayout {
                     Kirigami.FormData.label: i18n("Tag (optional):")
-                    Layout.topMargin: Kirigami.Units.smallSpacing
 
                     QQC2.ComboBox {
                         id: tagComboBox
@@ -199,7 +210,6 @@ QQC2.Dialog {
                     id: descriptionField
                     Kirigami.FormData.label: i18n("Description:")
                     Layout.fillWidth: true
-                    Layout.topMargin: Kirigami.Units.smallSpacing
                     text: root.description
                     placeholderText: i18n("Describe the work you did...")
                 }
@@ -208,8 +218,7 @@ QQC2.Dialog {
                 QQC2.ScrollView {
                     Kirigami.FormData.label: i18n("Notes (optional):")
                     Layout.fillWidth: true
-                    Layout.topMargin: Kirigami.Units.smallSpacing
-                    implicitHeight: Kirigami.Units.gridUnit * 2.5
+                    implicitHeight: Kirigami.Units.gridUnit * 4
 
                     QQC2.TextArea {
                         id: notesField
@@ -225,8 +234,7 @@ QQC2.Dialog {
                 QQC2.ScrollView {
                     Kirigami.FormData.label: i18n("Next Planned Stage (optional):")
                     Layout.fillWidth: true
-                    Layout.topMargin: Kirigami.Units.smallSpacing
-                    implicitHeight: Kirigami.Units.gridUnit * 2
+                    implicitHeight: Kirigami.Units.gridUnit * 2.5
 
                     QQC2.TextArea {
                         id: nextStageField
@@ -243,6 +251,121 @@ QQC2.Dialog {
 
     TagManagementDialog {
         id: tagManagementDialog
+    }
+
+    QQC2.Dialog {
+        id: calendarDialog
+        modal: true
+        anchors.centerIn: parent
+        width: Kirigami.Units.gridUnit * 22
+        height: Kirigami.Units.gridUnit * 16
+
+        property int displayMonth: 0
+        property int displayYear: 2025
+
+        onOpened: {
+            displayMonth = dateField.selectedDate.getMonth()
+            displayYear = dateField.selectedDate.getFullYear()
+        }
+
+        contentItem: ColumnLayout {
+            spacing: Kirigami.Units.smallSpacing
+            implicitHeight: Kirigami.Units.gridUnit * 14
+
+            // Month/Year navigation
+            RowLayout {
+                Layout.fillWidth: true
+
+                QQC2.ToolButton {
+                    icon.name: "go-previous"
+                    onClicked: {
+                        if (calendarDialog.displayMonth === 0) {
+                            calendarDialog.displayMonth = 11
+                            calendarDialog.displayYear--
+                        } else {
+                            calendarDialog.displayMonth--
+                        }
+                    }
+                }
+
+                QQC2.Label {
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    font.bold: true
+                    text: Qt.locale().monthName(calendarDialog.displayMonth) + " " + calendarDialog.displayYear
+                }
+
+                QQC2.ToolButton {
+                    icon.name: "go-next"
+                    onClicked: {
+                        if (calendarDialog.displayMonth === 11) {
+                            calendarDialog.displayMonth = 0
+                            calendarDialog.displayYear++
+                        } else {
+                            calendarDialog.displayMonth++
+                        }
+                    }
+                }
+            }
+
+            // Day of week headers
+            DayOfWeekRow {
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 18
+                locale: Qt.locale()
+                delegate: QQC2.Label {
+                    text: model.shortName
+                    horizontalAlignment: Text.AlignHCenter
+                    opacity: 0.6
+                }
+            }
+
+            // Month grid
+            MonthGrid {
+                id: monthGrid
+                Layout.fillWidth: true
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 18
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 10
+                month: calendarDialog.displayMonth
+                year: calendarDialog.displayYear
+                locale: Qt.locale()
+
+                delegate: QQC2.AbstractButton {
+                    id: dayDelegate
+                    implicitWidth: monthGrid.width / 7
+                    implicitHeight: monthGrid.height / 6
+
+                    readonly property bool isSelected:
+                        model.day === dateField.selectedDate.getDate() &&
+                        model.month === dateField.selectedDate.getMonth() &&
+                        model.year === dateField.selectedDate.getFullYear()
+                    readonly property bool isCurrentMonth: model.month === monthGrid.month
+
+                    contentItem: QQC2.Label {
+                        text: model.day
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        opacity: isCurrentMonth ? 1.0 : 0.3
+                        font.bold: isSelected
+                        color: isSelected ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                    }
+
+                    background: Rectangle {
+                        visible: isSelected
+                        color: Kirigami.Theme.highlightColor
+                        radius: width / 2
+                    }
+
+                    onClicked: {
+                        dateField.applyDate(model.date)
+                        calendarDialog.close()
+                    }
+                }
+            }
+
+            // Bottom spacer
+            Item { Layout.fillHeight: true }
+        }
     }
 
     Connections {
