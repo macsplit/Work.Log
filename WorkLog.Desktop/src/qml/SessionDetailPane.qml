@@ -3,7 +3,7 @@ import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 1.15
 import org.kde.kirigami 2.19 as Kirigami
 
-Kirigami.Page {
+Kirigami.ScrollablePage {
     id: root
 
     property var session: null
@@ -32,7 +32,7 @@ Kirigami.Page {
     }
 
     Column {
-        anchors.fill: parent
+        width: parent.width
         spacing: Kirigami.Units.smallSpacing
         visible: root.session !== null
 
