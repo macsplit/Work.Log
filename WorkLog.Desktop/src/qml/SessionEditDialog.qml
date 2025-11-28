@@ -26,6 +26,12 @@ QQC2.Dialog {
 
     onTagIdChanged: tagComboBox.refreshSelection()
 
+    onSessionDateChanged: dateField.applyDate(sessionDate)
+    onTimeHoursChanged: hoursSpinBox.value = Math.round(timeHours * 2)
+    onDescriptionChanged: descriptionField.text = description
+    onNotesChanged: notesField.text = notes
+    onNextPlannedStageChanged: nextStageField.text = nextPlannedStage
+
     onOpened: descriptionField.forceActiveFocus()
 
     onAccepted: {
