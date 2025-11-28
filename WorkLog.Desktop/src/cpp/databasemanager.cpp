@@ -465,8 +465,7 @@ double DatabaseManager::getAverageHoursPerWeekForMonth(int year, int month)
 {
     QSqlQuery query(m_database);
     query.prepare(QStringLiteral(R"(
-        SELECT IFNULL(SUM(TimeHours), 0) as TotalHours,
-               COUNT(DISTINCT strftime('%W', SessionDate)) as WeekCount
+        SELECT IFNULL(SUM(TimeHours), 0) as TotalHours
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
           AND strftime('%m', SessionDate) = :month
@@ -476,9 +475,17 @@ double DatabaseManager::getAverageHoursPerWeekForMonth(int year, int month)
     query.bindValue(QStringLiteral(":month"), QString::number(month).rightJustified(2, QLatin1Char('0')));
 
     if (query.exec() && query.next()) {
-        const double total = query.value(QStringLiteral("TotalHours")).toDouble();
-        const int weeks = query.value(QStringLiteral("WeekCount")).toInt();
-        return weeks > 0 ? total / weeks : 0.0;
+        const double totalHours = query.value(QStringLiteral("TotalHours")).toDouble();
+
+        // Get the exact number of days in this month (handles leap years)
+        QDate date(year, month, 1);
+        const int daysInMonth = date.daysInMonth();
+
+        if (daysInMonth > 0) {
+            // Calculate hours per day, then multiply by 7 for hours per week
+            const double hoursPerDay = totalHours / daysInMonth;
+            return hoursPerDay * 7.0;
+        }
     }
 
     return 0.0;

@@ -224,22 +224,24 @@ public class WorkSessionService : IWorkSessionService
 
     public async Task<double> GetAverageHoursPerWeekForMonth(int userId, int year, int month)
     {
-        var sessions = await _context.WorkSessions
+        var totalHours = await _context.WorkSessions
             .Where(s => s.UserId == userId &&
                         s.SessionDate.Year == year &&
                         s.SessionDate.Month == month &&
                         !s.IsDeleted)
-            .ToListAsync();
+            .SumAsync(s => s.TimeHours);
 
-        var weekGroups = sessions
-            .GroupBy(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)))
-            .ToList();
+        // Get the exact number of days in this month (handles leap years)
+        var daysInMonth = DateTime.DaysInMonth(year, month);
 
-        if (!weekGroups.Any())
-            return 0.0;
+        if (daysInMonth > 0)
+        {
+            // Calculate hours per day, then multiply by 7 for hours per week
+            var hoursPerDay = totalHours / daysInMonth;
+            return hoursPerDay * 7.0;
+        }
 
-        var totalHours = weekGroups.Sum(g => g.Sum(s => s.TimeHours));
-        return totalHours / weekGroups.Count;
+        return 0.0;
     }
 
     public async Task<IEnumerable<TagTotal>> GetTagTotalsForWeek(int userId, int year, int week)
