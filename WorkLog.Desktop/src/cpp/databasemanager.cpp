@@ -205,7 +205,7 @@ QVariantMap DatabaseManager::getSession(int id)
         SELECT ws.*, t.Name as TagName
         FROM WorkSessions ws
         LEFT JOIN Tags t ON ws.TagId = t.Id
-        WHERE ws.Id = :id
+        WHERE ws.Id = :id AND ws.IsDeleted = 0
     )"));
     query.bindValue(QStringLiteral(":id"), id);
 
@@ -232,7 +232,7 @@ QVariantList DatabaseManager::getSessionsForDate(const QDate &date)
         SELECT ws.*, t.Name as TagName
         FROM WorkSessions ws
         LEFT JOIN Tags t ON ws.TagId = t.Id
-        WHERE ws.SessionDate = :date
+        WHERE ws.SessionDate = :date AND ws.IsDeleted = 0
         ORDER BY ws.CreatedAt ASC
     )"));
     query.bindValue(QStringLiteral(":date"), date.toString(Qt::ISODate));
@@ -263,6 +263,7 @@ QVariantList DatabaseManager::getYears()
     query.exec(QStringLiteral(R"(
         SELECT DISTINCT strftime('%Y', SessionDate) as Year
         FROM WorkSessions
+        WHERE IsDeleted = 0
         ORDER BY Year ASC
     )"));
 
@@ -280,7 +281,7 @@ QVariantList DatabaseManager::getMonthsForYear(int year)
     query.prepare(QStringLiteral(R"(
         SELECT DISTINCT strftime('%m', SessionDate) as Month
         FROM WorkSessions
-        WHERE strftime('%Y', SessionDate) = :year
+        WHERE strftime('%Y', SessionDate) = :year AND IsDeleted = 0
         ORDER BY Month ASC
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
@@ -303,6 +304,7 @@ QVariantList DatabaseManager::getWeeksForMonth(int year, int month)
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
           AND strftime('%m', SessionDate) = :month
+          AND IsDeleted = 0
         ORDER BY Week ASC
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
@@ -326,6 +328,7 @@ QVariantList DatabaseManager::getDaysForWeek(int year, int week)
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
           AND strftime('%W', SessionDate) = :week
+          AND IsDeleted = 0
         ORDER BY SessionDate ASC
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
@@ -349,6 +352,7 @@ QVariantList DatabaseManager::getDaysForMonth(int year, int month)
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
           AND strftime('%m', SessionDate) = :month
+          AND IsDeleted = 0
         ORDER BY SessionDate ASC
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
@@ -371,6 +375,7 @@ double DatabaseManager::getTotalHoursForWeek(int year, int week)
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
           AND strftime('%W', SessionDate) = :week
+          AND IsDeleted = 0
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
     query.bindValue(QStringLiteral(":week"), QString::number(week).rightJustified(2, QLatin1Char('0')));
@@ -390,6 +395,7 @@ double DatabaseManager::getTotalHoursForMonth(int year, int month)
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
           AND strftime('%m', SessionDate) = :month
+          AND IsDeleted = 0
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
     query.bindValue(QStringLiteral(":month"), QString::number(month).rightJustified(2, QLatin1Char('0')));
@@ -407,7 +413,7 @@ double DatabaseManager::getTotalHoursForYear(int year)
     query.prepare(QStringLiteral(R"(
         SELECT IFNULL(SUM(TimeHours), 0)
         FROM WorkSessions
-        WHERE strftime('%Y', SessionDate) = :year
+        WHERE strftime('%Y', SessionDate) = :year AND IsDeleted = 0
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
 
@@ -424,7 +430,7 @@ double DatabaseManager::getTotalHoursForDate(const QDate &date)
     query.prepare(QStringLiteral(R"(
         SELECT IFNULL(SUM(TimeHours), 0)
         FROM WorkSessions
-        WHERE SessionDate = :date
+        WHERE SessionDate = :date AND IsDeleted = 0
     )"));
     query.bindValue(QStringLiteral(":date"), date.toString(Qt::ISODate));
 
@@ -442,7 +448,7 @@ double DatabaseManager::getAverageHoursPerWeekForYear(int year)
         SELECT IFNULL(SUM(TimeHours), 0) as TotalHours,
                COUNT(DISTINCT strftime('%W', SessionDate)) as WeekCount
         FROM WorkSessions
-        WHERE strftime('%Y', SessionDate) = :year
+        WHERE strftime('%Y', SessionDate) = :year AND IsDeleted = 0
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
 
@@ -464,6 +470,7 @@ double DatabaseManager::getAverageHoursPerWeekForMonth(int year, int month)
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
           AND strftime('%m', SessionDate) = :month
+          AND IsDeleted = 0
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
     query.bindValue(QStringLiteral(":month"), QString::number(month).rightJustified(2, QLatin1Char('0')));
@@ -487,6 +494,7 @@ QVariantList DatabaseManager::getTagTotalsForWeek(int year, int week)
         LEFT JOIN Tags t ON w.TagId = t.Id
         WHERE strftime('%Y', w.SessionDate) = :year
           AND strftime('%W', w.SessionDate) = :week
+          AND w.IsDeleted = 0
         GROUP BY IFNULL(t.Name, 'Untagged')
         ORDER BY TotalHours DESC
     )"));
@@ -513,7 +521,7 @@ QVariantList DatabaseManager::getTagTotalsForDay(const QDate &date)
         SELECT IFNULL(t.Name, 'Untagged') as TagName, SUM(w.TimeHours) as TotalHours
         FROM WorkSessions w
         LEFT JOIN Tags t ON w.TagId = t.Id
-        WHERE w.SessionDate = :date
+        WHERE w.SessionDate = :date AND w.IsDeleted = 0
         GROUP BY IFNULL(t.Name, 'Untagged')
         ORDER BY TotalHours DESC
     )"));
