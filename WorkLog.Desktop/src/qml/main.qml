@@ -150,6 +150,10 @@ Kirigami.ApplicationWindow {
                 Database.createSession(sessionDate, timeHours, description, notes, nextPlannedStage, tagId)
             } else {
                 Database.updateSession(sessionId, sessionDate, timeHours, description, notes, nextPlannedStage, tagId)
+                // Refresh selected session to show updated details
+                if (root.selectedSession && root.selectedSession.id === sessionId) {
+                    root.selectedSession = Database.getSession(sessionId)
+                }
             }
         }
     }
