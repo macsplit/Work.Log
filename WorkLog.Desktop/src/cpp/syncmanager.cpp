@@ -445,6 +445,31 @@ void SyncManager::syncTags()
         ) WHERE TagId IS NOT NULL
     )"));
 
+    // Reload sessions to pick up updated TagCloudIds
+    m_localSessions.clear();
+    QSqlQuery sessionQuery;
+    sessionQuery.exec(QStringLiteral(R"(
+        SELECT Id, SessionDate, TimeHours, Description, Notes, NextPlannedStage,
+               TagId, CreatedAt, UpdatedAt, CloudId, IsDeleted, TagCloudId
+        FROM WorkSessions
+    )"));
+    while (sessionQuery.next()) {
+        QVariantMap session;
+        session[QStringLiteral("id")] = sessionQuery.value(0);
+        session[QStringLiteral("sessionDate")] = sessionQuery.value(1);
+        session[QStringLiteral("timeHours")] = sessionQuery.value(2);
+        session[QStringLiteral("description")] = sessionQuery.value(3);
+        session[QStringLiteral("notes")] = sessionQuery.value(4);
+        session[QStringLiteral("nextPlannedStage")] = sessionQuery.value(5);
+        session[QStringLiteral("tagId")] = sessionQuery.value(6);
+        session[QStringLiteral("createdAt")] = sessionQuery.value(7);
+        session[QStringLiteral("updatedAt")] = sessionQuery.value(8);
+        session[QStringLiteral("cloudId")] = sessionQuery.value(9);
+        session[QStringLiteral("isDeleted")] = sessionQuery.value(10).toBool();
+        session[QStringLiteral("tagCloudId")] = sessionQuery.value(11);
+        m_localSessions.append(session);
+    }
+
     // Now sync sessions
     syncSessions();
 }
