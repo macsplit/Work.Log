@@ -822,50 +822,50 @@ body[data-theme="dark"] .session-notes-content :not(pre) > code {
     background-color: rgba(156, 163, 175, 0.2);
 }
 
-/* Warm Neutral Theme - beige pastel tones */
+/* Warm Neutral Theme - earthy middle tones with complementary colors */
 body[data-theme="warm-neutral"] {
-    --primary-color: #a67c52;
-    --primary-hover: #8b6644;
-    --danger-color: #b76e5e;
-    --danger-hover: #9d5a4c;
-    --success-color: #7a9b6f;
-    --text-color: #3e3028;
-    --text-muted: #7a6f5d;
-    --bg-color: #f5f0e8;
-    --card-bg: #fdfaf5;
-    --border-color: #e0d5c7;
+    --primary-color: #8b7355;
+    --primary-hover: #6f5c44;
+    --danger-color: #c67b5c;
+    --danger-hover: #a86448;
+    --success-color: #6b8e6f;
+    --text-color: #2d2520;
+    --text-muted: #6d6157;
+    --bg-color: #d4c7b8;
+    --card-bg: #e8ddd0;
+    --border-color: #b8a895;
 }
 
 body[data-theme="warm-neutral"] .form-control {
-    background-color: #fdfaf5;
+    background-color: #e8ddd0;
     color: var(--text-color);
 }
 
 body[data-theme="warm-neutral"] .session-next {
-    background-color: #f0e8db;
+    background-color: #d9cfc2;
 }
 
-/* Cool Blush Theme - greyish pink pastel */
+/* Cool Blush Theme - mauve and dusty blue middle tones */
 body[data-theme="cool-blush"] {
-    --primary-color: #9b7b99;
-    --primary-hover: #836984;
-    --danger-color: #b87f8f;
-    --danger-hover: #a16b7a;
-    --success-color: #7b9b92;
-    --text-color: #3a2e38;
-    --text-muted: #7a6f78;
-    --bg-color: #f5f0f4;
-    --card-bg: #faf7f9;
-    --border-color: #e6dce4;
+    --primary-color: #8b7c9e;
+    --primary-hover: #6f6582;
+    --danger-color: #c67b8a;
+    --danger-hover: #a86472;
+    --success-color: #7a9c96;
+    --text-color: #2d2733;
+    --text-muted: #6d6370;
+    --bg-color: #cfc5d6;
+    --card-bg: #e2dae6;
+    --border-color: #b5a8bd;
 }
 
 body[data-theme="cool-blush"] .form-control {
-    background-color: #faf7f9;
+    background-color: #e2dae6;
     color: var(--text-color);
 }
 
 body[data-theme="cool-blush"] .session-next {
-    background-color: #f0e8ef;
+    background-color: #d5cdd9;
 }
 
 /* Midnight Theme - dark sophisticated theme inspired by dark IDEs */
