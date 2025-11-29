@@ -31,4 +31,14 @@ public interface IAuthService
     /// Updates the last login timestamp for a user.
     /// </summary>
     Task UpdateLastLogin(int userId);
+
+    /// <summary>
+    /// Gets the theme preference for a user.
+    /// </summary>
+    Task<string?> GetUserTheme(int userId);
+
+    /// <summary>
+    /// Sets the theme preference for a user.
+    /// </summary>
+    Task SetUserTheme(int userId, string? theme);
 }

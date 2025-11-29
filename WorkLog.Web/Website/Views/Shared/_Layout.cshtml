@@ -1,3 +1,19 @@
+@using System.Security.Claims
+@using WorkLog.Domain.Services
+@inject IAuthService AuthService
+
+@{
+    string? userTheme = null;
+    if (User.Identity?.IsAuthenticated == true)
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
+        {
+            userTheme = await AuthService.GetUserTheme(userId);
+        }
+    }
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +33,7 @@
     <link rel="stylesheet" href="/lib/highlightjs/github.min.css" />
     <link rel="stylesheet" href="/lib/highlightjs/github-dark.min.css" media="(prefers-color-scheme: dark)" />
 </head>
-<body>
+<body @(string.IsNullOrEmpty(userTheme) ? "" : $"data-theme=\"{userTheme}\"")>
     <header class="site-header">
         <nav class="navbar">
             <a class="navbar-brand" href="/">Work Log</a>
@@ -29,6 +45,16 @@
                 </div>
                 <div class="nav-user">
                     <span>@User.Identity.Name</span>
+                    <select id="theme-selector" class="theme-selector" onchange="changeTheme(this.value)">
+                        <option value="">Auto</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="warm-neutral">Warm Neutral</option>
+                        <option value="cool-blush">Cool Blush</option>
+                        <option value="midnight">Midnight</option>
+                        <option value="sage">Sage</option>
+                        <option value="twilight">Twilight</option>
+                    </select>
                     <form asp-controller="Auth" asp-action="Logout" method="post" class="logout-form">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-link">Logout</button>

@@ -17,6 +17,8 @@ public class User
 
     public DateTime? LastLoginAt { get; set; }
 
+    public string? Theme { get; set; }
+
     // Navigation properties
     public ICollection<WorkSession> WorkSessions { get; set; } = new List<WorkSession>();
     public ICollection<Tag> Tags { get; set; } = new List<Tag>();

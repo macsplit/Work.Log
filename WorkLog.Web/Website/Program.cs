@@ -81,6 +81,12 @@ void ApplyMigrations(WorkLogDbContext dbContext)
         if (!columns.Contains("TagCloudId"))
             ExecuteSql(connection, "ALTER TABLE WorkSessions ADD COLUMN TagCloudId TEXT");
 
+        // Check and add missing columns to Users table
+        columns = GetTableColumns(connection, "Users");
+
+        if (!columns.Contains("Theme"))
+            ExecuteSql(connection, "ALTER TABLE Users ADD COLUMN Theme TEXT");
+
         // Ensure SyncMetadata table exists
         ExecuteSql(connection, @"CREATE TABLE IF NOT EXISTS SyncMetadata (
             Key TEXT PRIMARY KEY,

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initAjaxNavigation();
     initHierarchyScrollPersistence();
     renderSessionNotesMarkdown();
+    initThemeSelector();
 });
 
 // Handle browser back/forward buttons
@@ -368,4 +369,41 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+// Theme management
+function initThemeSelector() {
+    const selector = document.getElementById('theme-selector');
+    if (!selector) return;
+
+    // Set the selected option based on the current theme
+    const currentTheme = document.body.getAttribute('data-theme') || '';
+    selector.value = currentTheme;
+}
+
+async function changeTheme(theme) {
+    // Apply theme immediately
+    if (theme) {
+        document.body.setAttribute('data-theme', theme);
+    } else {
+        document.body.removeAttribute('data-theme');
+    }
+
+    // Save theme preference to server
+    try {
+        const formData = new FormData();
+        formData.append('theme', theme || '');
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+        if (token) {
+            formData.append('__RequestVerificationToken', token);
+        }
+
+        await fetch('/Auth/SetTheme', {
+            method: 'POST',
+            body: formData
+        });
+    } catch (error) {
+        console.error('Failed to save theme preference:', error);
+    }
 }

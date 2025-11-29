@@ -101,4 +101,20 @@ public class AuthService : IAuthService
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<string?> GetUserTheme(int userId)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        return user?.Theme;
+    }
+
+    public async Task SetUserTheme(int userId, string? theme)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user != null)
+        {
+            user.Theme = theme;
+            await _context.SaveChangesAsync();
+        }
+    }
 }
