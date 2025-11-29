@@ -964,3 +964,34 @@ body[data-theme="twilight"] .session-next {
 body[data-theme="twilight"] .session-notes-content :not(pre) > code {
     background-color: rgba(183, 148, 200, 0.2);
 }
+
+/* Rainbow Theme - fun pastel rainbow with medium background */
+body[data-theme="rainbow"] {
+    --primary-color: #7b9cd8;
+    --primary-hover: #5f7db5;
+    --danger-color: #e89ba8;
+    --danger-hover: #d17585;
+    --success-color: #8dd4a9;
+    --text-color: #3a3547;
+    --text-muted: #7a7282;
+    --bg-color: #d8d3e0;
+    --card-bg: #ebe7f2;
+    --border-color: #c5bdd4;
+}
+
+body[data-theme="rainbow"] .form-control {
+    background-color: #ebe7f2;
+    color: var(--text-color);
+}
+
+body[data-theme="rainbow"] .session-next {
+    background-color: #dfd9ea;
+}
+
+body[data-theme="rainbow"] .tag-badge {
+    background: linear-gradient(135deg, #b4a5e8 0%, #8dd4a9 50%, #ffc4a3 100%);
+}
+
+body[data-theme="rainbow"] .tree-item.selected {
+    background: linear-gradient(135deg, #7b9cd8 0%, #9d8dd8 100%);
+}
