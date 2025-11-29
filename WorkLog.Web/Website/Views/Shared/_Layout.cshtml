@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="/lib/highlightjs/github.min.css" />
     <link rel="stylesheet" href="/lib/highlightjs/github-dark.min.css" media="(prefers-color-scheme: dark)" />
 </head>
-<body @(string.IsNullOrEmpty(userTheme) ? "" : $"data-theme=\"{userTheme}\"")>
+<body data-theme="@(userTheme ?? "")">
     <header class="site-header">
         <nav class="navbar">
             <a class="navbar-brand" href="/">Work Log</a>
