@@ -22,11 +22,7 @@
     "modules": [
         {
             "name": "worklog-desktop",
-            "buildsystem": "cmake-ninja",
-            "config-opts": [
-                "-DCMAKE_BUILD_TYPE=Release",
-                "-DENABLE_SYNC=OFF"
-            ],
+            "buildsystem": "simple",
             "sources": [
                 {
                     "type": "git",
@@ -34,10 +30,10 @@
                     "branch": "main"
                 }
             ],
-            "post-install": [
-                "install -Dm644 WorkLog.Desktop/work.worklog.desktop.desktop ${FLATPAK_DEST}/share/applications/work.worklog.desktop.desktop",
-                "install -Dm644 WorkLog.Desktop/work.worklog.desktop.metainfo.xml ${FLATPAK_DEST}/share/metainfo/work.worklog.desktop.metainfo.xml",
-                "install -Dm644 WorkLog.Desktop/work.worklog.desktop.svg ${FLATPAK_DEST}/share/icons/hicolor/scalable/apps/work.worklog.desktop.svg"
+            "build-commands": [
+                "cd WorkLog.Desktop && cmake -G Ninja . -DCMAKE_INSTALL_PREFIX=/app -DCMAKE_BUILD_TYPE=Release -DENABLE_SYNC=OFF",
+                "cd WorkLog.Desktop && ninja",
+                "cd WorkLog.Desktop && ninja install"
             ]
         }
     ]
