@@ -49,3 +49,4 @@ target_link_libraries(worklog-desktop
 install(TARGETS worklog-desktop ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES work.worklog.desktop.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 install(FILES work.worklog.desktop.metainfo.xml DESTINATION ${KDE_INSTALL_METAINFODIR})
+install(FILES work.worklog.desktop.svg DESTINATION ${KDE_INSTALL_FULL_ICONDIR}/hicolor/scalable/apps)

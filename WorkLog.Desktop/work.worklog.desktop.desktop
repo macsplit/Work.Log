@@ -2,7 +2,7 @@
 Name=Work Log
 Comment=Track your work sessions
 Exec=worklog-desktop
-Icon=appointment-new
+Icon=work.worklog.desktop
 Type=Application
 Terminal=false
 Categories=Office;ProjectManagement;
