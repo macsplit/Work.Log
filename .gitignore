@@ -7,7 +7,13 @@ Dependencies/
 
 # Build directories
 WorkLog.Desktop/build/
+WorkLog.Desktop/build-*/
 WorkLog.Desktop/cmake-build-*/
+
+# Flatpak build directories
+WorkLog.Desktop/.flatpak-builder/
+WorkLog.Desktop/flatpak-build-dir/
+WorkLog.Desktop/repo/
 
 # Qt Creator
 *.pro.user
