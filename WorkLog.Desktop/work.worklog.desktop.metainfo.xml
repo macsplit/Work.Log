@@ -17,7 +17,6 @@
             <li>View statistics including total hours per day, week, and month</li>
             <li>Calendar popup for easy date selection</li>
             <li>SQLite database for reliable local storage with no cloud dependencies</li>
-            <li>Optional cloud sync for multi-device access (requires separate sync server)</li>
         </ul>
     </description>
     <launchable type="desktop-id">work.worklog.desktop.desktop</launchable>
@@ -47,7 +46,6 @@
                     <li>Statistics and totals for daily, weekly, and monthly hours</li>
                     <li>Calendar date picker for easy date selection</li>
                     <li>Local SQLite database storage</li>
-                    <li>Optional cloud sync capability via DynamoDB</li>
                 </ul>
             </description>
         </release>

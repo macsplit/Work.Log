@@ -14,6 +14,15 @@ Kirigami.ApplicationWindow {
     property var selectedSession: null
     property date selectedDate: new Date()
 
+    // Check if sync is enabled at compile time
+    readonly property bool syncEnabled: {
+        try {
+            return typeof SyncManager !== 'undefined'
+        } catch (e) {
+            return false
+        }
+    }
+
     pageStack.initialPage: mainPage
 
     Component {
@@ -51,6 +60,7 @@ Kirigami.ApplicationWindow {
                     icon.name: "cloud-upload"
                     text: i18n("Cloud Sync")
                     onTriggered: syncDialog.open()
+                    visible: root.syncEnabled
                 },
                 Kirigami.Action {
                     icon.name: "tag"
@@ -208,9 +218,18 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    SyncDialog {
-        id: syncDialog
+    Loader {
+        id: syncDialogLoader
+        active: root.syncEnabled
+        sourceComponent: Component {
+            SyncDialog {
+                id: syncDialog
+            }
+        }
     }
+
+    // Alias for backward compatibility
+    property var syncDialog: syncDialogLoader.item
 
     TagManagementDialog {
         id: tagDialog

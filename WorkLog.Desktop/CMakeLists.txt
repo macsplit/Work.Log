@@ -15,8 +15,16 @@ include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMSetupVersion)
 
+# Build options
+option(ENABLE_SYNC "Enable cloud sync functionality" ON)
+
 # Use Qt5 with KF5 Kirigami (compatible with Ubuntu 24.04)
-find_package(Qt5 5.15 REQUIRED COMPONENTS Core Quick Sql QuickControls2 Widgets Network)
+set(QT_COMPONENTS Core Quick Sql QuickControls2 Widgets)
+if(ENABLE_SYNC)
+    list(APPEND QT_COMPONENTS Network)
+endif()
+
+find_package(Qt5 5.15 REQUIRED COMPONENTS ${QT_COMPONENTS})
 find_package(KF5 REQUIRED COMPONENTS Kirigami2 I18n CoreAddons)
 
 # Application sources
@@ -26,8 +34,12 @@ set(worklog_SRCS
     src/cpp/worksessionmodel.cpp
     src/cpp/hierarchymodel.cpp
     src/cpp/tagmodel.cpp
-    src/cpp/syncmanager.cpp
 )
+
+if(ENABLE_SYNC)
+    list(APPEND worklog_SRCS src/cpp/syncmanager.cpp)
+    add_definitions(-DENABLE_SYNC)
+endif()
 
 # Qt resources
 qt5_add_resources(worklog_SRCS resources/resources.qrc)
@@ -40,11 +52,14 @@ target_link_libraries(worklog-desktop
     Qt5::Sql
     Qt5::QuickControls2
     Qt5::Widgets
-    Qt5::Network
     KF5::Kirigami2
     KF5::I18n
     KF5::CoreAddons
 )
+
+if(ENABLE_SYNC)
+    target_link_libraries(worklog-desktop Qt5::Network)
+endif()
 
 install(TARGETS worklog-desktop ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES work.worklog.desktop.desktop DESTINATION ${KDE_INSTALL_APPDIR})

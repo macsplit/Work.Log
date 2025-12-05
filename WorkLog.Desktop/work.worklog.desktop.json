@@ -10,8 +10,7 @@
         "--socket=wayland",
         "--device=dri",
         "--filesystem=xdg-data/WorkLog:create",
-        "--filesystem=xdg-config/WorkLog:create",
-        "--share=network"
+        "--filesystem=xdg-config/WorkLog:create"
     ],
     "cleanup": [
         "/include",
@@ -25,7 +24,8 @@
             "name": "worklog-desktop",
             "buildsystem": "cmake-ninja",
             "config-opts": [
-                "-DCMAKE_BUILD_TYPE=Release"
+                "-DCMAKE_BUILD_TYPE=Release",
+                "-DENABLE_SYNC=OFF"
             ],
             "sources": [
                 {

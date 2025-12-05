@@ -11,7 +11,9 @@
 #include "worksessionmodel.h"
 #include "hierarchymodel.h"
 #include "tagmodel.h"
+#ifdef ENABLE_SYNC
 #include "syncmanager.h"
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -40,7 +42,9 @@ int main(int argc, char *argv[])
     WorkSessionModel *sessionModel = new WorkSessionModel(dbManager, &app);
     HierarchyModel *hierarchyModel = new HierarchyModel(dbManager, &app);
     TagModel *tagModel = new TagModel(dbManager, &app);
+#ifdef ENABLE_SYNC
     SyncManager *syncManager = new SyncManager(dbManager, &app);
+#endif
 
     QQmlApplicationEngine engine;
 
@@ -49,7 +53,9 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("org.worklog", 1, 0, "SessionModel", sessionModel);
     qmlRegisterSingletonInstance("org.worklog", 1, 0, "HierarchyModel", hierarchyModel);
     qmlRegisterSingletonInstance("org.worklog", 1, 0, "TagModel", tagModel);
+#ifdef ENABLE_SYNC
     qmlRegisterSingletonInstance("org.worklog", 1, 0, "SyncManager", syncManager);
+#endif
 
     engine.rootContext()->setContextObject(new KLocalizedContext(&engine));
 
