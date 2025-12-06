@@ -6,7 +6,6 @@ using WorkLog.Website.Models;
 
 namespace WorkLog.Website.Controllers;
 
-[Authorize]
 public class HomeController : Controller
 {
     private readonly IWorkSessionService _sessionService;
@@ -22,7 +21,17 @@ public class HomeController : Controller
         return claim != null ? int.Parse(claim.Value) : 0;
     }
 
-    public async Task<IActionResult> Index(int? year, int? month, int? week, string? date)
+    public IActionResult Index()
+    {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Dashboard");
+        }
+        return View();
+    }
+
+    [Authorize]
+    public async Task<IActionResult> Dashboard(int? year, int? month, int? week, string? date)
     {
         var userId = GetCurrentUserId();
 
@@ -84,6 +93,11 @@ public class HomeController : Controller
         }
 
         return View(viewModel);
+    }
+
+    public IActionResult SignUp()
+    {
+        return View();
     }
 
     public IActionResult Error()

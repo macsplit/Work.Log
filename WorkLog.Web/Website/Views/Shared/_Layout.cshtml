@@ -40,6 +40,7 @@
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <div class="nav-links">
+                    <a asp-controller="Home" asp-action="Dashboard" class="nav-link">Dashboard</a>
                     <a asp-controller="Tag" asp-action="Index" class="nav-link">Tags</a>
                     <a asp-controller="Sync" asp-action="Index" class="nav-link">Sync</a>
                 </div>
@@ -60,6 +61,13 @@
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-link">Logout</button>
                     </form>
+                </div>
+            }
+            else
+            {
+                <div class="nav-user">
+                    <a asp-controller="Auth" asp-action="Login" class="nav-link">Login</a>
+                    <a asp-controller="Home" asp-action="SignUp" class="nav-link">Sign Up</a>
                 </div>
             }
         </nav>

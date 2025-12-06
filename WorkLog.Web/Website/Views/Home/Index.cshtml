@@ -1,194 +1,263 @@
-@model HierarchyViewModel
 @{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Work Log - Track your work sessions";
 }
 
-<div class="dashboard-layout">
-    <!-- Left sidebar: Hierarchy navigation -->
-    <aside class="hierarchy-panel">
-        <div class="panel-header">
-            <h2>Navigate</h2>
-            <a asp-controller="Session" asp-action="Create"
-               asp-route-date="@Model.SelectedDate?.ToString("yyyy-MM-dd")"
-               class="btn btn-primary btn-sm">+ New Session</a>
+<div class="landing-page">
+    <div class="hero-section">
+        <h1>Work Log</h1>
+        <p class="tagline">Track your work sessions with hierarchical time organization</p>
+    </div>
+
+    <div class="content-section">
+        <div class="description">
+            <p>Work Log is a native KDE application designed to help you track and organize your work sessions with a focus on simplicity and local data control. Whether you're a freelancer tracking billable hours, a developer logging coding sessions, or anyone who wants to maintain a detailed record of their work, Work Log provides an intuitive interface for capturing what you've accomplished.</p>
+
+            <p>The application organizes your work sessions in a hierarchical tree structure (Year → Month → Week → Day), making it easy to browse your work history and see patterns over time. Each session can include the time spent (in half-hour increments), a description of what you worked on, detailed notes in Markdown format, and what you plan to do next.</p>
+
+            <p>All data is stored locally in a SQLite database on your computer, giving you complete control and privacy. The application is built with Qt and KDE Frameworks, providing a responsive and native experience on Linux desktops.</p>
         </div>
 
-        <!-- Tree hierarchy: Years -> Months -> Weeks -> Days -->
-        @if (Model.Years.Any())
-        {
-            <ul class="hierarchy-list tree-root">
-                @foreach (var year in Model.Years)
-                {
-                    var yearSelected = Model.SelectedYear == year;
-                    var avgPerWeek = Model.YearAverageHoursPerWeek.TryGetValue(year, out var yAvg) ? yAvg : 0.0;
-                    <li class="tree-node @(yearSelected ? "expanded" : "")">
-                        <a asp-action="Index" asp-route-year="@(yearSelected ? null : year)" class="tree-item @(yearSelected ? "selected" : "")">
-                            <span class="tree-icon">@(yearSelected ? "▼" : "▶")</span>
-                            @year (@avgPerWeek.ToString("0.0")h/wk)
-                        </a>
+        <div class="screenshot-container">
+            <img src="https://raw.githubusercontent.com/macsplit/Work.Log/v1.0.0/screenshots/desktop-main.png"
+                 alt="Work Log Desktop Application"
+                 class="screenshot">
+            <p class="screenshot-caption">Main window showing hierarchical session navigation and session details</p>
+        </div>
 
-                        @if (yearSelected && Model.Months.Any())
-                        {
-                            <ul class="hierarchy-list tree-children">
-                                @foreach (var month in Model.Months)
-                                {
-                                    var monthSelected = Model.SelectedMonth == month;
-                                    var mAvg = Model.MonthAverageHoursPerWeek.TryGetValue(month, out var mAvgVal) ? mAvgVal : 0.0;
-                                    <li class="tree-node @(monthSelected ? "expanded" : "")">
-                                        <a asp-action="Index"
-                                           asp-route-year="@Model.SelectedYear"
-                                           asp-route-month="@(monthSelected ? null : month)"
-                                           class="tree-item @(monthSelected ? "selected" : "")">
-                                            <span class="tree-icon">@(monthSelected ? "▼" : "▶")</span>
-                                            @Model.GetMonthName(month) (@mAvg.ToString("0.0")h/wk)
-                                        </a>
-
-                                        @if (monthSelected && Model.Weeks.Any())
-                                        {
-                                            <ul class="hierarchy-list tree-children">
-                                                @foreach (var week in Model.Weeks)
-                                                {
-                                                    var weekSelected = Model.SelectedWeek == week;
-                                                    var wTotal = Model.WeekTotalHours.TryGetValue(week, out var wTotalVal) ? wTotalVal : 0.0;
-                                                    <li class="tree-node @(weekSelected ? "expanded" : "")">
-                                                        <a asp-action="Index"
-                                                           asp-route-year="@Model.SelectedYear"
-                                                           asp-route-month="@Model.SelectedMonth"
-                                                           asp-route-week="@(weekSelected ? null : week)"
-                                                           class="tree-item @(weekSelected ? "selected" : "")">
-                                                            <span class="tree-icon">@(weekSelected ? "▼" : "▶")</span>
-                                                            @Model.GetWeekLabel(week) (@wTotal.ToString("0.0")h)
-                                                        </a>
-
-                                                        @if (weekSelected && Model.Days.Any())
-                                                        {
-                                                            <ul class="hierarchy-list tree-children">
-                                                                @foreach (var day in Model.Days)
-                                                                {
-                                                                    var daySelected = Model.SelectedDate == day;
-                                                                    var dTotal = Model.DayTotalHours.TryGetValue(day, out var dTotalVal) ? dTotalVal : 0.0;
-                                                                    <li class="tree-node">
-                                                                        <a asp-action="Index"
-                                                                           asp-route-year="@Model.SelectedYear"
-                                                                           asp-route-month="@Model.SelectedMonth"
-                                                                           asp-route-week="@Model.SelectedWeek"
-                                                                           asp-route-date="@day.ToString("yyyy-MM-dd")"
-                                                                           class="tree-item tree-leaf @(daySelected ? "selected" : "")">
-                                                                            <span class="tree-icon">📅</span>
-                                                                            @Model.GetDayLabel(day) (@dTotal.ToString("0.0")h)
-                                                                        </a>
-                                                                    </li>
-                                                                }
-                                                            </ul>
-                                                        }
-                                                    </li>
-                                                }
-                                            </ul>
-                                        }
-                                    </li>
-                                }
-                            </ul>
-                        }
-                    </li>
-                }
+        <div class="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Hierarchical navigation by year, month, week, and day for easy browsing</li>
+                <li>Record work sessions with time (0.5 hour increments), description, notes, and next planned stage</li>
+                <li>Organize sessions with custom tags for categorization</li>
+                <li>View statistics including total hours per day, week, and month</li>
+                <li>Calendar popup for easy date selection</li>
+                <li>SQLite database for reliable local storage with no cloud dependencies</li>
             </ul>
-        }
-        else
-        {
-            <p class="empty-message">No sessions recorded yet</p>
-        }
-    </aside>
+        </div>
 
-    <!-- Main content area -->
-    <main class="content-panel">
-        @if (Model.SelectedDate.HasValue)
-        {
-            <div class="day-header">
-                <h1>@Model.SelectedDate.Value.ToString("dddd, MMMM d, yyyy")</h1>
-                <div class="day-summary">
-                    <span class="total-hours">@Model.TotalHours hours</span>
-                    <span class="session-count">@Model.Sessions.Count session(s)</span>
+        <div class="platforms">
+            <h2>Available Platforms</h2>
+            <div class="platform-cards">
+                <div class="platform-card">
+                    <h3>Desktop (KDE)</h3>
+                    <p>Native Qt/KDE application for Linux desktops</p>
+                    <a href="https://flathub.org/apps/work.worklog.worklog" class="btn">Get on Flathub</a>
+                </div>
+                <div class="platform-card">
+                    <h3>Web Application</h3>
+                    <p>Self-hosted ASP.NET Core web application</p>
+                    <p class="note">This instance is in early stage development and not currently accepting public sign-ups.</p>
                 </div>
             </div>
+        </div>
 
-            <!-- Session list -->
-            <div class="sessions-panel">
-                @if (Model.Sessions.Any())
-                {
-                    <div class="session-list">
-                        @foreach (var session in Model.Sessions)
-                        {
-                            <div class="session-card" data-session-id="@session.Id">
-                                <div class="session-header">
-                                    <span class="session-time">@session.TimeHours hour(s)</span>
-                                    @if (session.Tag != null)
-                                    {
-                                        <span class="tag-badge">@session.Tag.Name</span>
-                                    }
-                                    <div class="session-actions">
-                                        <a asp-controller="Session" asp-action="Edit" asp-route-id="@session.Id"
-                                           class="btn btn-sm">Edit</a>
-                                        <form asp-controller="Session" asp-action="Delete" asp-route-id="@session.Id"
-                                              method="post" class="delete-form"
-                                              onsubmit="return confirm('Are you sure you want to delete this session?');">
-                                            @Html.AntiForgeryToken()
-                                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="session-description">
-                                    <p>@session.Description</p>
-                                </div>
-                                @if (!string.IsNullOrEmpty(session.Notes))
-                                {
-                                    <div class="session-notes">
-                                        <strong>Notes:</strong>
-                                        <div class="session-notes-content">@session.Notes</div>
-                                    </div>
-                                }
-                                @if (!string.IsNullOrEmpty(session.NextPlannedStage))
-                                {
-                                    <div class="session-next">
-                                        <strong>Next Planned Stage:</strong>
-                                        <p>@session.NextPlannedStage</p>
-                                    </div>
-                                }
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="empty-state">
-                        <p>No sessions for this day</p>
-                        <a asp-controller="Session" asp-action="Create"
-                           asp-route-date="@Model.SelectedDate.Value.ToString("yyyy-MM-dd")"
-                           class="btn btn-primary">Add First Session</a>
-                    </div>
-                }
+        <div class="self-hosting">
+            <h2>Self-Hosting Instructions</h2>
+            <p>You can host your own instance of Work Log. The application is open source and available on GitHub.</p>
 
-                @if (Model.TagTotals.Any())
-                {
-                    <div class="tag-totals-strip">
-                        <span class="tag-totals-label">Week:</span>
-                        @foreach (var tagTotal in Model.TagTotals)
-                        {
-                            <span class="tag-total-badge">@tagTotal.TagName (@tagTotal.TotalHours.ToString("0.0")h)</span>
-                        }
-                    </div>
-                }
-            </div>
-        }
-        else
-        {
-            <div class="welcome-message">
-                <h1>Welcome to Work Log</h1>
-                <p>Select a date from the hierarchy to view or add work sessions.</p>
-                @if (!Model.Years.Any())
-                {
-                    <a asp-controller="Session" asp-action="Create" class="btn btn-primary">Add Your First Session</a>
-                }
-            </div>
-        }
-    </main>
+            <h3>Requirements</h3>
+            <ul>
+                <li>.NET 8.0 SDK or runtime</li>
+                <li>SQLite (included with .NET)</li>
+                <li>Web server (nginx, Apache, or Kestrel standalone)</li>
+            </ul>
+
+            <h3>Quick Start</h3>
+            <pre><code>git clone https://github.com/macsplit/Work.Log.git
+cd Work.Log/WorkLog.Web/Website
+dotnet publish -c Release -o ./publish
+cd publish
+./WorkLog.Website</code></pre>
+
+            <p>For detailed setup instructions, SSL configuration, and production deployment, see the <a href="https://github.com/macsplit/Work.Log" target="_blank">GitHub repository</a>.</p>
+        </div>
+    </div>
 </div>
+
+<style>
+.landing-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.hero-section {
+    text-align: center;
+    padding: 3rem 0 2rem;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.hero-section h1 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.tagline {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.content-section {
+    line-height: 1.6;
+}
+
+.description {
+    margin-bottom: 3rem;
+}
+
+.description p {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.screenshot-container {
+    text-align: center;
+    margin: 3rem 0;
+}
+
+.screenshot {
+    max-width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.screenshot-caption {
+    margin-top: 1rem;
+    font-style: italic;
+    color: var(--text-secondary);
+}
+
+.features {
+    margin: 3rem 0;
+}
+
+.features h2 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.features ul {
+    list-style: disc;
+    margin-left: 2rem;
+}
+
+.features li {
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.platforms {
+    margin: 3rem 0;
+}
+
+.platforms h2 {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+}
+
+.platform-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 1.5rem;
+}
+
+.platform-card {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.platform-card h3 {
+    color: var(--text-color);
+    margin-bottom: 0.5rem;
+}
+
+.platform-card p {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.platform-card .note {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.btn:hover {
+    background: var(--primary-hover);
+}
+
+.self-hosting {
+    margin: 3rem 0;
+    padding: 2rem;
+    background: var(--card-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.self-hosting h2 {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.self-hosting h3 {
+    color: var(--text-color);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.self-hosting p {
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.self-hosting ul {
+    list-style: disc;
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.self-hosting li {
+    color: var(--text-color);
+}
+
+.self-hosting pre {
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: 4px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.self-hosting code {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.self-hosting a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.self-hosting a:hover {
+    text-decoration: underline;
+}
+</style>

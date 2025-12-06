@@ -45,6 +45,7 @@ worklog-desktop
 WorkLog.Web/**/bin/
 WorkLog.Web/**/obj/
 WorkLog.Web/**/out/
+WorkLog.Web/**/publish/
 
 # .NET
 *.dll
