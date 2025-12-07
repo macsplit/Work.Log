@@ -22,7 +22,7 @@
                     var yearSelected = Model.SelectedYear == year;
                     var avgPerWeek = Model.YearAverageHoursPerWeek.TryGetValue(year, out var yAvg) ? yAvg : 0.0;
                     <li class="tree-node @(yearSelected ? "expanded" : "")">
-                        <a asp-action="Index" asp-route-year="@(yearSelected ? null : year)" class="tree-item @(yearSelected ? "selected" : "")">
+                        <a asp-action="Dashboard" asp-route-year="@(yearSelected ? null : year)" class="tree-item @(yearSelected ? "selected" : "")">
                             <span class="tree-icon">@(yearSelected ? "▼" : "▶")</span>
                             @year (@avgPerWeek.ToString("0.0")h/wk)
                         </a>
@@ -35,7 +35,7 @@
                                     var monthSelected = Model.SelectedMonth == month;
                                     var mAvg = Model.MonthAverageHoursPerWeek.TryGetValue(month, out var mAvgVal) ? mAvgVal : 0.0;
                                     <li class="tree-node @(monthSelected ? "expanded" : "")">
-                                        <a asp-action="Index"
+                                        <a asp-action="Dashboard"
                                            asp-route-year="@Model.SelectedYear"
                                            asp-route-month="@(monthSelected ? null : month)"
                                            class="tree-item @(monthSelected ? "selected" : "")">
@@ -51,7 +51,7 @@
                                                     var weekSelected = Model.SelectedWeek == week;
                                                     var wTotal = Model.WeekTotalHours.TryGetValue(week, out var wTotalVal) ? wTotalVal : 0.0;
                                                     <li class="tree-node @(weekSelected ? "expanded" : "")">
-                                                        <a asp-action="Index"
+                                                        <a asp-action="Dashboard"
                                                            asp-route-year="@Model.SelectedYear"
                                                            asp-route-month="@Model.SelectedMonth"
                                                            asp-route-week="@(weekSelected ? null : week)"
@@ -68,7 +68,7 @@
                                                                     var daySelected = Model.SelectedDate == day;
                                                                     var dTotal = Model.DayTotalHours.TryGetValue(day, out var dTotalVal) ? dTotalVal : 0.0;
                                                                     <li class="tree-node">
-                                                                        <a asp-action="Index"
+                                                                        <a asp-action="Dashboard"
                                                                            asp-route-year="@Model.SelectedYear"
                                                                            asp-route-month="@Model.SelectedMonth"
                                                                            asp-route-week="@Model.SelectedWeek"
