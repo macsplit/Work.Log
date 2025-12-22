@@ -218,18 +218,10 @@ Kirigami.ApplicationWindow {
         }
     }
 
-    Loader {
-        id: syncDialogLoader
-        active: root.syncEnabled
-        sourceComponent: Component {
-            SyncDialog {
-                id: syncDialog
-            }
-        }
+    SyncDialog {
+        id: syncDialog
+        visible: false
     }
-
-    // Alias for backward compatibility
-    property var syncDialog: syncDialogLoader.item
 
     TagManagementDialog {
         id: tagDialog
