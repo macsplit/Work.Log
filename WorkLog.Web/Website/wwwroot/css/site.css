@@ -296,6 +296,7 @@ textarea.form-control {
     background-color: var(--card-bg);
     border-radius: 0.5rem;
     padding: 1rem;
+    padding-bottom: 9rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     flex-shrink: 0;
     overflow-y: auto;
