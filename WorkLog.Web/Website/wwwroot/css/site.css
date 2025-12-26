@@ -634,14 +634,39 @@ textarea.form-control {
 
 /* Responsive */
 @media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden;
+        max-width: 100vw;
+    }
+
+    .main-content {
+        padding: 0.5rem;
+    }
+
     .dashboard-layout {
         flex-direction: column;
+        padding: 0.5rem;
+        gap: 1rem;
+        width: 100%;
+        max-width: 100%;
     }
 
     .hierarchy-panel {
         width: 100%;
         position: static;
         max-height: none;
+        padding: 0.75rem;
+    }
+
+    .content-panel {
+        padding: 0.75rem;
+        overflow-x: hidden;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .session-card {
+        padding: 0.75rem;
     }
 
     .hierarchy-section.indented,
@@ -656,6 +681,31 @@ textarea.form-control {
 
     .tag-input-row .btn {
         width: 100%;
+    }
+
+    .session-notes-content pre {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .session-notes-content code {
+        font-size: 0.75rem;
+        word-break: break-all;
+    }
+
+    .day-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .day-header h1 {
+        font-size: 1.25rem;
+    }
+
+    .session-header {
+        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 }
 
