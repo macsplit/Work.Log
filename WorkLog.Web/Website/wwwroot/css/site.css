@@ -500,6 +500,13 @@ textarea.form-control {
 .session-notes-content pre {
     overflow-x: auto;
     border-radius: 0.5rem;
+    max-width: 100%;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.session-notes-content code {
+    word-wrap: break-word;
 }
 
 .delete-form {
