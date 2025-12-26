@@ -384,6 +384,8 @@ textarea.form-control {
     border-radius: 0.5rem;
     padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    min-width: 0;
+    overflow-x: auto;
 }
 
 .day-header {
@@ -425,6 +427,8 @@ textarea.form-control {
     border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     padding: 1rem;
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 
 .session-header {
@@ -464,6 +468,8 @@ textarea.form-control {
     padding-top: 0.5rem;
     border-top: 1px solid var(--border-color);
     margin-top: 0.5rem;
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 
 .session-notes strong,
