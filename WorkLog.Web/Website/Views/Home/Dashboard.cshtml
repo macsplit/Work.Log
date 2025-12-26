@@ -192,3 +192,15 @@
         }
     </main>
 </div>
+
+@section Scripts {
+<script>
+    // Scroll hierarchy panel to bottom on load to show latest content
+    document.addEventListener('DOMContentLoaded', function() {
+        const hierarchyPanel = document.querySelector('.hierarchy-panel');
+        if (hierarchyPanel && !@(Model.SelectedYear.HasValue ? "true" : "false")) {
+            hierarchyPanel.scrollTop = hierarchyPanel.scrollHeight;
+        }
+    });
+</script>
+}

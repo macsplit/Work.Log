@@ -16,6 +16,7 @@ Kirigami.ScrollablePage {
     Column {
         width: parent.width
         spacing: 0
+        bottomPadding: Kirigami.Units.gridUnit * 3
 
         // Header
         Kirigami.Heading {
