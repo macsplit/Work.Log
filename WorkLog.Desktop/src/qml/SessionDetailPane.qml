@@ -113,11 +113,13 @@ Kirigami.ScrollablePage {
             visible: root.session && root.session.notes && root.session.notes.length > 0
         }
 
-        QQC2.Label {
+        Text {
             width: parent.width
             visible: root.session && root.session.notes && root.session.notes.length > 0
             text: root.session ? (root.session.notes || "") : ""
             wrapMode: Text.Wrap
+            textFormat: Text.MarkdownText
+            color: Kirigami.Theme.textColor
             opacity: 0.8
         }
 
