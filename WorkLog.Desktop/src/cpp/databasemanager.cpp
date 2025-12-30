@@ -100,6 +100,8 @@ bool DatabaseManager::createTables()
 
     // Migration: Add new columns for existing databases
     query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN TagId INTEGER REFERENCES Tags(Id) ON DELETE SET NULL"));
+    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN CreatedAt TEXT NOT NULL DEFAULT (datetime('now'))"));
+    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))"));
     query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN CloudId TEXT"));
     query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0"));
     query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN TagCloudId TEXT"));
@@ -300,7 +302,7 @@ QVariantList DatabaseManager::getWeeksForMonth(int year, int month)
     QVariantList results;
     QSqlQuery query(m_database);
     query.prepare(QStringLiteral(R"(
-        SELECT DISTINCT strftime('%W', SessionDate) as Week
+        SELECT DISTINCT (CAST(strftime('%W', SessionDate) AS INTEGER) + 1) as Week
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
           AND strftime('%m', SessionDate) = :month
@@ -327,12 +329,12 @@ QVariantList DatabaseManager::getDaysForWeek(int year, int week)
         SELECT DISTINCT SessionDate
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
-          AND strftime('%W', SessionDate) = :week
+          AND (CAST(strftime('%W', SessionDate) AS INTEGER) + 1) = :week
           AND IsDeleted = 0
         ORDER BY SessionDate ASC
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
-    query.bindValue(QStringLiteral(":week"), QString::number(week).rightJustified(2, QLatin1Char('0')));
+    query.bindValue(QStringLiteral(":week"), week);
 
     if (query.exec()) {
         while (query.next()) {
@@ -374,11 +376,11 @@ double DatabaseManager::getTotalHoursForWeek(int year, int week)
         SELECT IFNULL(SUM(TimeHours), 0)
         FROM WorkSessions
         WHERE strftime('%Y', SessionDate) = :year
-          AND strftime('%W', SessionDate) = :week
+          AND (CAST(strftime('%W', SessionDate) AS INTEGER) + 1) = :week
           AND IsDeleted = 0
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
-    query.bindValue(QStringLiteral(":week"), QString::number(week).rightJustified(2, QLatin1Char('0')));
+    query.bindValue(QStringLiteral(":week"), week);
 
     if (query.exec() && query.next()) {
         return query.value(0).toDouble();
@@ -500,13 +502,13 @@ QVariantList DatabaseManager::getTagTotalsForWeek(int year, int week)
         FROM WorkSessions w
         LEFT JOIN Tags t ON w.TagId = t.Id
         WHERE strftime('%Y', w.SessionDate) = :year
-          AND strftime('%W', w.SessionDate) = :week
+          AND (CAST(strftime('%W', w.SessionDate) AS INTEGER) + 1) = :week
           AND w.IsDeleted = 0
         GROUP BY IFNULL(t.Name, 'Untagged')
         ORDER BY TotalHours DESC
     )"));
     query.bindValue(QStringLiteral(":year"), QString::number(year));
-    query.bindValue(QStringLiteral(":week"), QString::number(week).rightJustified(2, QLatin1Char('0')));
+    query.bindValue(QStringLiteral(":week"), week);
 
     if (query.exec()) {
         while (query.next()) {

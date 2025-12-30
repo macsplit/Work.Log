@@ -381,7 +381,7 @@ void SyncManager::syncTags()
             QDateTime localUpdated = QDateTime::fromString(localTag[QStringLiteral("updatedAt")].toString(), Qt::ISODate);
             QDateTime cloudUpdated = QDateTime::fromString(cloudUpdatedAt, Qt::ISODate);
 
-            if (cloudUpdated > localUpdated) {
+            if (cloudUpdated.isValid() && cloudUpdated > localUpdated) {
                 // Cloud is newer - update local
                 QSqlQuery query;
                 query.prepare(QStringLiteral("UPDATE Tags SET Name = :name, UpdatedAt = :updated, IsDeleted = :deleted WHERE Id = :id"));
@@ -394,11 +394,17 @@ void SyncManager::syncTags()
             }
         } else if (!cloudIsDeleted) {
             // New tag from cloud
+            // Validate UpdatedAt - use current time if empty
+            QString validUpdatedAt = cloudUpdatedAt;
+            if (validUpdatedAt.isEmpty() || !QDateTime::fromString(validUpdatedAt, Qt::ISODate).isValid()) {
+                validUpdatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+            }
+
             QSqlQuery query;
             query.prepare(QStringLiteral("INSERT INTO Tags (Name, CloudId, UpdatedAt, IsDeleted) VALUES (:name, :cloudId, :updated, 0)"));
             query.bindValue(QStringLiteral(":name"), cloudName);
             query.bindValue(QStringLiteral(":cloudId"), cloudId);
-            query.bindValue(QStringLiteral(":updated"), cloudUpdatedAt);
+            query.bindValue(QStringLiteral(":updated"), validUpdatedAt);
             query.exec();
             m_currentResult.tagsDownloaded++;
         }
@@ -513,7 +519,7 @@ void SyncManager::syncSessions()
             QDateTime localUpdated = QDateTime::fromString(localSession[QStringLiteral("updatedAt")].toString(), Qt::ISODate);
             QDateTime cloudUpdated = QDateTime::fromString(cloudUpdatedAt, Qt::ISODate);
 
-            if (cloudUpdated > localUpdated) {
+            if (cloudUpdated.isValid() && cloudUpdated > localUpdated) {
                 // Cloud is newer - update local
                 QString tagCloudId = cloudSession[QStringLiteral("TagCloudId")].toObject()[QStringLiteral("S")].toString();
                 QVariant tagId = tagIdByCloudId.contains(tagCloudId) ? QVariant(tagIdByCloudId[tagCloudId]) : QVariant();
@@ -544,6 +550,18 @@ void SyncManager::syncSessions()
             QString tagCloudId = cloudSession[QStringLiteral("TagCloudId")].toObject()[QStringLiteral("S")].toString();
             QVariant tagId = tagIdByCloudId.contains(tagCloudId) ? QVariant(tagIdByCloudId[tagCloudId]) : QVariant();
 
+            // Validate timestamps - use current time if empty or invalid
+            QString cloudCreatedAt = cloudSession[QStringLiteral("CreatedAt")].toObject()[QStringLiteral("S")].toString();
+            QString validCreatedAt = cloudCreatedAt;
+            if (validCreatedAt.isEmpty() || !QDateTime::fromString(validCreatedAt, Qt::ISODate).isValid()) {
+                validCreatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+            }
+
+            QString validUpdatedAt = cloudUpdatedAt;
+            if (validUpdatedAt.isEmpty() || !QDateTime::fromString(validUpdatedAt, Qt::ISODate).isValid()) {
+                validUpdatedAt = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+            }
+
             QSqlQuery query;
             query.prepare(QStringLiteral(R"(
                 INSERT INTO WorkSessions (SessionDate, TimeHours, Description, Notes, NextPlannedStage,
@@ -557,8 +575,8 @@ void SyncManager::syncSessions()
             query.bindValue(QStringLiteral(":next"), cloudSession[QStringLiteral("NextPlannedStage")].toObject()[QStringLiteral("S")].toString());
             query.bindValue(QStringLiteral(":tagId"), tagId);
             query.bindValue(QStringLiteral(":tagCloudId"), tagCloudId);
-            query.bindValue(QStringLiteral(":created"), cloudSession[QStringLiteral("CreatedAt")].toObject()[QStringLiteral("S")].toString());
-            query.bindValue(QStringLiteral(":updated"), cloudUpdatedAt);
+            query.bindValue(QStringLiteral(":created"), validCreatedAt);
+            query.bindValue(QStringLiteral(":updated"), validUpdatedAt);
             query.bindValue(QStringLiteral(":cloudId"), cloudId);
             query.exec();
             m_currentResult.sessionsDownloaded++;
@@ -619,8 +637,13 @@ void SyncManager::uploadTag(const QVariantMap &tag)
     nameAttr[QStringLiteral("S")] = tag[QStringLiteral("name")].toString();
     item[QStringLiteral("Name")] = nameAttr;
 
+    // Validate and ensure UpdatedAt is not empty
+    QString updatedAtStr = tag[QStringLiteral("updatedAt")].toString();
+    if (updatedAtStr.isEmpty()) {
+        updatedAtStr = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    }
     QJsonObject updatedAtAttr;
-    updatedAtAttr[QStringLiteral("S")] = tag[QStringLiteral("updatedAt")].toString();
+    updatedAtAttr[QStringLiteral("S")] = updatedAtStr;
     item[QStringLiteral("UpdatedAt")] = updatedAtAttr;
 
     QJsonObject isDeletedAttr;
@@ -672,12 +695,22 @@ void SyncManager::uploadSession(const QVariantMap &session)
         item[QStringLiteral("TagCloudId")] = tagCloudIdAttr;
     }
 
+    // Validate and ensure CreatedAt is not empty
+    QString createdAtStr = session[QStringLiteral("createdAt")].toString();
+    if (createdAtStr.isEmpty()) {
+        createdAtStr = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    }
     QJsonObject createdAtAttr;
-    createdAtAttr[QStringLiteral("S")] = session[QStringLiteral("createdAt")].toString();
+    createdAtAttr[QStringLiteral("S")] = createdAtStr;
     item[QStringLiteral("CreatedAt")] = createdAtAttr;
 
+    // Validate and ensure UpdatedAt is not empty
+    QString updatedAtStr = session[QStringLiteral("updatedAt")].toString();
+    if (updatedAtStr.isEmpty()) {
+        updatedAtStr = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    }
     QJsonObject updatedAtAttr;
-    updatedAtAttr[QStringLiteral("S")] = session[QStringLiteral("updatedAt")].toString();
+    updatedAtAttr[QStringLiteral("S")] = updatedAtStr;
     item[QStringLiteral("UpdatedAt")] = updatedAtAttr;
 
     QJsonObject isDeletedAttr;

@@ -154,7 +154,7 @@ public class WorkSessionService : IWorkSessionService
             .ToListAsync();
 
         return sessions
-            .Select(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)))
+            .Select(s => GetWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)))
             .Distinct()
             .OrderBy(w => w)
             .ToList();
@@ -167,7 +167,7 @@ public class WorkSessionService : IWorkSessionService
             .ToListAsync();
 
         return sessions
-            .Where(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)) == week)
+            .Where(s => GetWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)) == week)
             .Select(s => s.SessionDate)
             .Distinct()
             .OrderBy(d => d)
@@ -201,7 +201,7 @@ public class WorkSessionService : IWorkSessionService
             .ToListAsync();
 
         return sessions
-            .Where(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)) == week)
+            .Where(s => GetWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)) == week)
             .Sum(s => s.TimeHours);
     }
 
@@ -212,7 +212,7 @@ public class WorkSessionService : IWorkSessionService
             .ToListAsync();
 
         var weekGroups = sessions
-            .GroupBy(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)))
+            .GroupBy(s => GetWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)))
             .ToList();
 
         if (!weekGroups.Any())
@@ -252,7 +252,7 @@ public class WorkSessionService : IWorkSessionService
             .ToListAsync();
 
         return sessions
-            .Where(s => GetIsoWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)) == week)
+            .Where(s => GetWeekOfYear(s.SessionDate.ToDateTime(TimeOnly.MinValue)) == week)
             .GroupBy(s => s.Tag?.Name ?? "Untagged")
             .Select(g => new TagTotal(g.Key, g.Sum(s => s.TimeHours)))
             .OrderByDescending(t => t.TotalHours)
@@ -270,14 +270,13 @@ public class WorkSessionService : IWorkSessionService
             .ToListAsync();
     }
 
-    private static int GetIsoWeekOfYear(DateTime date)
+    /// <summary>
+    /// Gets the week number (1-54) for a date, matching SQLite's strftime('%W') + 1.
+    /// Week 1 starts on the first Monday of the year, with any prior days also in week 1.
+    /// </summary>
+    private static int GetWeekOfYear(DateTime date)
     {
         var cal = CultureInfo.InvariantCulture.Calendar;
-        var day = cal.GetDayOfWeek(date);
-        if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
-        {
-            date = date.AddDays(3);
-        }
-        return cal.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        return cal.GetWeekOfYear(date, CalendarWeekRule.FirstDay, DayOfWeek.Monday);
     }
 }

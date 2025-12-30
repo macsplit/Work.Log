@@ -163,7 +163,10 @@ public class CloudSyncService : ICloudSyncService
             if (localByCloudId.TryGetValue(cloudTag.CloudId, out var localTag))
             {
                 // Exists locally - check if cloud is newer
-                var cloudUpdated = DateTime.Parse(cloudTag.UpdatedAt);
+                if (!DateTime.TryParse(cloudTag.UpdatedAt, out var cloudUpdated))
+                {
+                    cloudUpdated = DateTime.MinValue;
+                }
                 if (cloudUpdated > localTag.UpdatedAt)
                 {
                     // Cloud is newer - update local
@@ -183,12 +186,17 @@ public class CloudSyncService : ICloudSyncService
             else if (!cloudTag.IsDeleted)
             {
                 // New tag from cloud - create locally
+                if (!DateTime.TryParse(cloudTag.UpdatedAt, out var updatedAt))
+                {
+                    updatedAt = DateTime.UtcNow;
+                }
+
                 var newTag = new Tag
                 {
                     Name = cloudTag.Name,
                     UserId = userId,
                     CloudId = cloudTag.CloudId,
-                    UpdatedAt = DateTime.Parse(cloudTag.UpdatedAt),
+                    UpdatedAt = updatedAt,
                     IsDeleted = false
                 };
                 _context.Tags.Add(newTag);
@@ -209,7 +217,10 @@ public class CloudSyncService : ICloudSyncService
             else if (cloudByCloudId.TryGetValue(localTag.CloudId, out var cloudTag))
             {
                 // Exists in cloud - check if local is newer
-                var cloudUpdated = DateTime.Parse(cloudTag.UpdatedAt);
+                if (!DateTime.TryParse(cloudTag.UpdatedAt, out var cloudUpdated))
+                {
+                    cloudUpdated = DateTime.MinValue;
+                }
                 if (localTag.UpdatedAt > cloudUpdated)
                 {
                     // Local is newer - upload
@@ -261,7 +272,10 @@ public class CloudSyncService : ICloudSyncService
             if (localByCloudId.TryGetValue(cloudSession.CloudId, out var localSession))
             {
                 // Exists locally - check if cloud is newer
-                var cloudUpdated = DateTime.Parse(cloudSession.UpdatedAt);
+                if (!DateTime.TryParse(cloudSession.UpdatedAt, out var cloudUpdated))
+                {
+                    cloudUpdated = DateTime.MinValue;
+                }
                 if (cloudUpdated > localSession.UpdatedAt)
                 {
                     // Cloud is newer - update local
@@ -304,6 +318,16 @@ public class CloudSyncService : ICloudSyncService
                     tagId = tag.Id;
                 }
 
+                if (!DateTime.TryParse(cloudSession.CreatedAt, out var createdAt))
+                {
+                    createdAt = DateTime.UtcNow;
+                }
+
+                if (!DateTime.TryParse(cloudSession.UpdatedAt, out var updatedAt))
+                {
+                    updatedAt = DateTime.UtcNow;
+                }
+
                 var newSession = new WorkSession
                 {
                     SessionDate = DateOnly.Parse(cloudSession.SessionDate),
@@ -315,8 +339,8 @@ public class CloudSyncService : ICloudSyncService
                     TagCloudId = cloudSession.TagCloudId,
                     UserId = userId,
                     CloudId = cloudSession.CloudId,
-                    CreatedAt = DateTime.Parse(cloudSession.CreatedAt),
-                    UpdatedAt = DateTime.Parse(cloudSession.UpdatedAt),
+                    CreatedAt = createdAt,
+                    UpdatedAt = updatedAt,
                     IsDeleted = false
                 };
                 _context.WorkSessions.Add(newSession);
@@ -343,7 +367,10 @@ public class CloudSyncService : ICloudSyncService
             else if (cloudByCloudId.TryGetValue(localSession.CloudId, out var cloudSession))
             {
                 // Exists in cloud - check if local is newer
-                var cloudUpdated = DateTime.Parse(cloudSession.UpdatedAt);
+                if (!DateTime.TryParse(cloudSession.UpdatedAt, out var cloudUpdated))
+                {
+                    cloudUpdated = DateTime.MinValue;
+                }
                 if (localSession.UpdatedAt > cloudUpdated)
                 {
                     // Local is newer - upload
