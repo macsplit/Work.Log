@@ -98,17 +98,6 @@ bool DatabaseManager::createTables()
         qWarning() << "Failed to create SyncMetadata table:" << query.lastError().text();
     }
 
-    // Migration: Add new columns for existing databases
-    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN TagId INTEGER REFERENCES Tags(Id) ON DELETE SET NULL"));
-    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN CreatedAt TEXT NOT NULL DEFAULT (datetime('now'))"));
-    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))"));
-    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN CloudId TEXT"));
-    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0"));
-    query.exec(QStringLiteral("ALTER TABLE WorkSessions ADD COLUMN TagCloudId TEXT"));
-    query.exec(QStringLiteral("ALTER TABLE Tags ADD COLUMN CloudId TEXT"));
-    query.exec(QStringLiteral("ALTER TABLE Tags ADD COLUMN UpdatedAt TEXT NOT NULL DEFAULT (datetime('now'))"));
-    query.exec(QStringLiteral("ALTER TABLE Tags ADD COLUMN IsDeleted INTEGER NOT NULL DEFAULT 0"));
-
     // Create indexes
     query.exec(QStringLiteral("CREATE INDEX IF NOT EXISTS idx_worksessions_date ON WorkSessions(SessionDate)"));
     query.exec(QStringLiteral("CREATE INDEX IF NOT EXISTS idx_worksessions_cloudid ON WorkSessions(CloudId)"));
