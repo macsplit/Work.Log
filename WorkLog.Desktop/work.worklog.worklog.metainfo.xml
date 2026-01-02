@@ -36,6 +36,16 @@
         </screenshot>
     </screenshots>
     <releases>
+        <release version="1.0.1" date="2025-01-02">
+            <description>
+                <p>Bug fixes and improvements</p>
+                <ul>
+                    <li>Fixed week numbering at year boundaries</li>
+                    <li>Added markdown rendering support in session notes</li>
+                    <li>Improved UI spacing in hierarchy panel</li>
+                </ul>
+            </description>
+        </release>
         <release version="1.0.0" date="2024-11-29">
             <description>
                 <p>Initial release of Work Log Desktop</p>
