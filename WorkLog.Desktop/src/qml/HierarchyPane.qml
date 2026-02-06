@@ -49,7 +49,7 @@ Kirigami.ScrollablePage {
                     width: parent.width
                     text: i18n("%1 (%2h/wk)",
                                String(yearValue),
-                               HierarchyModel.yearAverageHoursPerWeek(yearValue).toFixed(1))
+                               (HierarchyModel.refreshCounter, HierarchyModel.yearAverageHoursPerWeek(yearValue)).toFixed(1))
                     highlighted: isExpanded
                     icon.name: isExpanded ? "go-down" : "go-next"
                     onClicked: {
@@ -82,7 +82,7 @@ Kirigami.ScrollablePage {
                                 leftPadding: Kirigami.Units.gridUnit
                                 text: i18n("%1 (%2h/wk)",
                                            HierarchyModel.monthName(monthValue),
-                                           HierarchyModel.monthAverageHoursPerWeek(monthValue).toFixed(1))
+                                           (HierarchyModel.refreshCounter, HierarchyModel.monthAverageHoursPerWeek(monthValue)).toFixed(1))
                                 highlighted: monthExpanded
                                 icon.name: monthExpanded ? "go-down" : "go-next"
                                 onClicked: {
@@ -114,7 +114,7 @@ Kirigami.ScrollablePage {
                                             leftPadding: Kirigami.Units.gridUnit * 2
                                             text: i18n("%1 (%2h)",
                                                        HierarchyModel.weekLabel(weekValue),
-                                                       HierarchyModel.weekTotalHours(weekValue).toFixed(1))
+                                                       (HierarchyModel.refreshCounter, HierarchyModel.weekTotalHours(weekValue)).toFixed(1))
                                             highlighted: weekExpanded
                                             icon.name: weekExpanded ? "go-down" : "go-next"
                                             onClicked: {
@@ -140,7 +140,7 @@ Kirigami.ScrollablePage {
                                                     property date itemDate: modelData
                                                     text: i18n("%1 (%2h)",
                                                                Qt.formatDate(itemDate, "ddd, MMM d"),
-                                                               HierarchyModel.dayTotalHours(itemDate).toFixed(1))
+                                                               (HierarchyModel.refreshCounter, HierarchyModel.dayTotalHours(itemDate)).toFixed(1))
                                                     icon.name: "view-calendar-day"
                                                     onClicked: {
                                                         root.dateSelected(itemDate)

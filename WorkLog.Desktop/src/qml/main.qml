@@ -158,12 +158,16 @@ Kirigami.ApplicationWindow {
         onAccepted: {
             if (sessionId < 0) {
                 Database.createSession(sessionDate, timeHours, description, notes, nextPlannedStage, tagId)
+                HierarchyModel.refresh()
+                SessionModel.refresh()
             } else {
                 Database.updateSession(sessionId, sessionDate, timeHours, description, notes, nextPlannedStage, tagId)
                 // Refresh selected session to show updated details
                 if (root.selectedSession && root.selectedSession.id === sessionId) {
                     root.selectedSession = Database.getSession(sessionId)
                 }
+                HierarchyModel.refresh()
+                SessionModel.refresh()
             }
         }
     }
