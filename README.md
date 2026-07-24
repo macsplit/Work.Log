@@ -39,6 +39,10 @@ Work.Log/
 └── README.md                 # This file
 ```
 
+For local/native cross-platform strategy, see [ROADMAP.md](ROADMAP.md). Linux
+native remains the first-class target; the roadmap documents Android,
+Windows/macOS, iOS, and .NET alternatives as potential future routes.
+
 ---
 
 ## Desktop Application (Kirigami)
